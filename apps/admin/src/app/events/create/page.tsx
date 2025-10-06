@@ -18,7 +18,7 @@ export default function CreateEventPage() {
                 <div className="space-y-6">
                     {/* Header with Back Link */}
                     <div className="flex items-center gap-4">
-                        <Link 
+                        <Link
                             href="/events"
                             className="flex items-center gap-2 text-[#8D99AE] hover:text-[#2B2D42] transition-colors"
                         >

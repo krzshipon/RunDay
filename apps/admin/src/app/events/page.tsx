@@ -119,7 +119,7 @@ export default function EventsPage() {
         setIsLoading(true);
         // Simulate API call
         setTimeout(() => {
-            setEvents(prev => prev.map(event => 
+            setEvents(prev => prev.map(event =>
                 event.id === eventId ? { ...event, ...data } : event
             ));
             setIsLoading(false);
@@ -146,7 +146,7 @@ export default function EventsPage() {
                             <h1 className="text-3xl font-bold text-[#2B2D42]">Events</h1>
                             <p className="mt-2 text-[#8D99AE]">Manage all your running events</p>
                         </div>
-                        <Link 
+                        <Link
                             href="/events/create"
                             className="flex items-center gap-2 bg-[#FF9F1C] hover:bg-[#FF9F1C]/90 text-white px-4 py-2 rounded-lg transition-colors"
                         >
@@ -213,7 +213,7 @@ export default function EventsPage() {
                             </div>
                             <h3 className="text-lg font-medium text-[#2B2D42] mb-2">No events yet</h3>
                             <p className="text-[#8D99AE] mb-4">Get started by creating your first running event.</p>
-                            <Link 
+                            <Link
                                 href="/events/create"
                                 className="bg-[#FF9F1C] hover:bg-[#FF9F1C]/90 text-white px-6 py-2 rounded-lg transition-colors inline-block"
                             >

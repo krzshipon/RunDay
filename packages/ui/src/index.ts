@@ -22,6 +22,10 @@ export { RoleManagementPanel } from './components/RoleManagementPanel'
 
 export { EventSearchBar } from './components/EventSearchBar'
 export { EventCard } from './components/EventCard'
+export { EventForm } from './components/EventForm'
+export { EventEditDialog } from './components/EventEditDialog'
+export { EventDuplicateButton } from './components/EventDuplicateButton'
+export { EventStatusToggle } from './components/EventStatusToggle'
 
 // Utilities
 export { cn, formatDate, formatTime, formatDateTime, getStatusColor } from './lib/utils'
