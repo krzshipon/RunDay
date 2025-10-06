@@ -1,20 +1,43 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/auth/AuthProvider';
+
 export default function UserHome() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
-      <div className="max-w-md mx-auto text-center">
-        <h1 className="text-4xl font-bold text-blue-900 mb-4">
-          RunDay
-        </h1>
-        <p className="text-lg text-blue-700 mb-8">
-          Your Running Journey Starts Here
-        </p>
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Coming Soon</h2>
-          <p className="text-gray-600">
-            Discover running events, register for races, and track your progress.
-          </p>
+  const { user, isVerified, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.push('/auth/signup');
+      } else if (user && isVerified) {
+        router.push('/dashboard');
+      } else if (user && !isVerified) {
+        router.push('/auth/verify-email');
+      }
+    }
+  }, [user, isVerified, loading, router]);
+
+  if (loading) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          background: 'linear-gradient(135deg, #EDF2F4 0%, rgba(141, 153, 174, 0.2) 100%)',
+        }}
+      >
+        <div className="text-center">
+          <div
+            className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-r-transparent"
+            style={{ borderColor: '#FF9F1C' }}
+          ></div>
+          <p className="mt-4" style={{ color: '#8D99AE' }}>Loading...</p>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 }
