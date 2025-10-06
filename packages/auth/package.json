@@ -1,0 +1,25 @@
+{
+    "name": "@runday/auth",
+    "version": "0.0.0",
+    "private": true,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsup src/index.ts --format cjs,esm --dts",
+        "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+        "type-check": "tsc --noEmit",
+        "clean": "rm -rf dist"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.38.0",
+        "@runday/database": "file:../database"
+    },
+    "peerDependencies": {
+        "react": "^18.2.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.0",
+        "tsup": "^8.0.0",
+        "typescript": "^5.2.0"
+    }
+}

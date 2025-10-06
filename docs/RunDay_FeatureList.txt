@@ -1,0 +1,38 @@
+﻿RunDay MVP - Feature & Implementation Plan
+This document provides a high-level overview of the core features and a strategic implementation plan for the RunDay web applications.
+Core Platform Features (Shared)
+* Email-Based Authentication:
+   * User Registration: Users can sign up using their full name, email, and a password.
+   * Email OTP Verification: On registration, an OTP is sent to the user's email for verification. The verification screen includes a "Resend OTP" button.
+   * User Login: Secure login for registered users.
+   * Role Management: The system distinguishes between Admin and User roles.
+      * Note: Admin role assignment will be handled manually in the backend (Supabase dashboard) for the MVP to ensure security and simplicity.
+RunDay Admin App
+A dedicated, secure application for event organizers.
+* Feature 1: Secure Admin Dashboard
+   * Login restricted to users with the 'Admin' role.
+   * Displays a list of all events created by the organizer, searchable by name.
+* Feature 2: Event Creation & Management
+   * An intuitive form to create new running events.
+   * Edit & Update: Ability to edit event details (name, date, etc.) after creation.
+   * Duplicate Event: A single-click option to duplicate an existing event to easily create recurring runs.
+   * Event Status Management: Admins can change an event's status from Upcoming to Completed.
+* Feature 3: Participant & Results Management
+   * View a detailed list of registered participants for each event, with a search bar to find users by name or bib number.
+   * A simple interface to manually input and update Bib Numbers and official Finish Times.
+   * Ability to save all results in one action.
+RunDay User App
+A private, dashboard-based application for registered runners.
+* Feature 1: User Dashboard & Event Discovery
+   * The dashboard lists all available Upcoming events for which they can register.
+   * Users can view key details like event name, date, and distance.
+* Feature 2: Simple Event Registration
+   * A "Register" button allows for single-click registration.
+   * Cancel Registration: Users can cancel their registration for an Upcoming event.
+   * The system prevents a user from registering for the same event more than once.
+* Feature 3: My Events & Results
+   * A dedicated "My Events" section lists all events the user has registered for (Upcoming and Completed).
+   * For Completed events, this section displays their personal results: position, bib number, and finish time.
+* Feature 4: Certificate Download
+   * Within the "My Events" section, participants can download a personalized certificate for any Completed event they participated in.
+   * The certificate is automatically populated with their name, event details, and official finish time.

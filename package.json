@@ -1,0 +1,27 @@
+{
+    "name": "runday-platform",
+    "version": "0.1.0",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "turbo build",
+        "dev": "turbo dev",
+        "lint": "turbo lint",
+        "type-check": "turbo type-check",
+        "clean": "turbo clean",
+        "test": "turbo test",
+        "admin": "npm run dev --workspace=apps/admin",
+        "user": "npm run dev --workspace=apps/user"
+    },
+    "devDependencies": {
+        "turbo": "^2.5.8",
+        "@turbo/gen": "^2.5.8"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "packageManager": "npm@10.2.4"
+}
