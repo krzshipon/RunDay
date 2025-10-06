@@ -8,7 +8,8 @@
         "build": "tsup src/index.ts --format cjs,esm --dts",
         "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
         "type-check": "tsc --noEmit",
-        "clean": "rm -rf dist"
+        "clean": "rm -rf dist",
+        "db:types": "npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/types.generated.ts"
     },
     "dependencies": {
         "@supabase/supabase-js": "^2.38.0",
