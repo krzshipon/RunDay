@@ -51,11 +51,27 @@ export function SignInForm() {
                 return;
             }
 
+            // Get the current user
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                setError('Authentication failed. Please try again.');
+                return;
+            }
+
             // Check if user is admin
-            const { data: profile } = await supabase
+            const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('role')
+                .eq('id', user.id)
                 .single();
+
+            if (profileError) {
+                setError('Failed to verify user permissions. Please try again.');
+                console.error('Profile query error:', profileError);
+                await supabase.auth.signOut();
+                return;
+            }
 
             if (profile?.role !== 'admin') {
                 setError('Access denied. Admin privileges required.');
