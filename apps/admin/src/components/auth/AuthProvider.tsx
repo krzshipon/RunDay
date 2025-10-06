@@ -33,41 +33,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [isAdmin, setIsAdmin] = useState(false);
     const [isCheckingAdmin, setIsCheckingAdmin] = useState(false);
 
+    const checkAdminStatus = async (user: User | null) => {
+        if (!user) {
+            setIsAdmin(false);
+            return false;
+        }
+
+        try {
+            console.log('Checking admin status for user:', user.id);
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError) {
+                console.error('Profile query error:', profileError);
+                setIsAdmin(false);
+                return false;
+            }
+
+            console.log('Profile found:', profile);
+            const isUserAdmin = profile?.role === 'admin';
+            console.log('Is admin:', isUserAdmin);
+            setIsAdmin(isUserAdmin);
+            return isUserAdmin;
+        } catch (error) {
+            console.error('Error checking admin status:', error);
+            setIsAdmin(false);
+            return false;
+        }
+    };
+
     useEffect(() => {
-        const checkAdminStatus = async (user: User | null) => {
-            if (!user) {
-                setIsAdmin(false);
-                setIsCheckingAdmin(false);
-                return;
-            }
-
-            setIsCheckingAdmin(true);
-            try {
-                console.log('Checking admin status for user:', user.id);
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('role')
-                    .eq('id', user.id)
-                    .single();
-
-                if (profileError) {
-                    console.error('Profile query error:', profileError);
-                    setIsAdmin(false);
-                    return;
-                }
-
-                console.log('Profile found:', profile);
-                const isUserAdmin = profile?.role === 'admin';
-                console.log('Is admin:', isUserAdmin);
-                setIsAdmin(isUserAdmin);
-            } catch (error) {
-                console.error('Error checking admin status:', error);
-                setIsAdmin(false);
-            } finally {
-                setIsCheckingAdmin(false);
-            }
-        };
-
         // Get initial session
         const initializeAuth = async () => {
             try {
@@ -105,7 +103,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } = supabase.auth.onAuthStateChange(async (event, session) => {
             console.log('Auth state change:', event, session?.user?.email);
 
-            // Only set loading for significant auth changes, not token refresh
+            // Only set loading for significant changes, not token refresh
             const isSignificantChange = [
                 'SIGNED_IN',
                 'SIGNED_OUT',
@@ -124,7 +122,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 await checkAdminStatus(session.user);
             } else {
                 setIsAdmin(false);
-                setIsCheckingAdmin(false);
             }
 
             // Only set loading to false for significant changes
@@ -146,7 +143,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             value={{
                 user,
                 session,
-                loading: loading || isCheckingAdmin,
+                loading,
                 isAdmin,
                 isCheckingAdmin,
                 signOut,
