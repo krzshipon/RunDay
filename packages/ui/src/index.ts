@@ -20,5 +20,8 @@ export type { BadgeProps } from './components/Badge'
 
 export { RoleManagementPanel } from './components/RoleManagementPanel'
 
+export { EventSearchBar } from './components/EventSearchBar'
+export { EventCard } from './components/EventCard'
+
 // Utilities
 export { cn, formatDate, formatTime, formatDateTime, getStatusColor } from './lib/utils'
