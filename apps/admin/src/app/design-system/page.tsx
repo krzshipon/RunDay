@@ -1,9 +1,6 @@
 'use client'
 
-import { Button } from "@/components/ui/Button"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/Card"
-import { Input } from "@/components/ui/Input"
-import { Badge, getStatusBadgeVariant } from "@/components/ui/Badge"
+import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Input, Badge, getStatusBadgeVariant } from "@runday/ui"
 
 export default function DesignSystem() {
     const sampleStatuses = ['active', 'pending', 'cancelled', 'draft']
