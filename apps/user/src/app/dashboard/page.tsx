@@ -1,11 +1,12 @@
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, Button } from '@runday/ui';
 import { Calendar, MapPin, Trophy, Users } from 'lucide-react';
 
 export default function DashboardPage() {
     return (
         <ProtectedRoute>
-            <div className="min-h-screen bg-gradient-to-br from-[#EDF2F4] to-[#8D99AE]/20 p-4">
+            <DashboardLayout>
                 <div className="max-w-4xl mx-auto">
                     <div className="space-y-8">
                         {/* Welcome Section */}
@@ -122,7 +123,7 @@ export default function DashboardPage() {
                         </Card>
                     </div>
                 </div>
-            </div>
+            </DashboardLayout>
         </ProtectedRoute>
     );
 }

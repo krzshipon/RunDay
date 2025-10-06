@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@runday/auth": "file:../../packages/auth",
+    "@runday/dashboard": "file:../../packages/dashboard",
     "@runday/database": "file:../../packages/database",
     "@runday/ui": "file:../../packages/ui",
     "@supabase/supabase-js": "^2.38.0",

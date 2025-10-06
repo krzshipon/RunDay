@@ -3,7 +3,7 @@
 import { useAuth } from '@/components/auth/AuthProvider';
 import {
     DashboardLayout as BaseDashboardLayout,
-    createAdminDashboardConfig,
+    createUserDashboardConfig,
     DashboardConfig
 } from '@runday/dashboard';
 
@@ -18,14 +18,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         return null; // This should be handled by ProtectedRoute
     }
 
-    // Create admin dashboard configuration
+    // Create user dashboard configuration
     const dashboardConfig: DashboardConfig = {
-        ...createAdminDashboardConfig(
+        ...createUserDashboardConfig(
             {
                 id: user.id,
                 email: user.email,
                 name: user.user_metadata?.full_name || user.email,
-                role: 'admin',
             },
             signOut
         ),
