@@ -8,22 +8,33 @@ export interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
 
 const Badge = forwardRef<HTMLDivElement, BadgeProps>(
     ({ className, variant = "neutral", size = "md", ...props }, ref) => {
+        const getBadgeStyles = () => {
+            switch (variant) {
+                case "success":
+                    return { backgroundColor: 'rgba(16, 185, 129, 0.2)', borderColor: '#10B981', color: '#10B981' }
+                case "warning":
+                    return { backgroundColor: 'rgba(255, 159, 28, 0.2)', borderColor: '#FF9F1C', color: '#FF9F1C' }
+                case "danger":
+                    return { backgroundColor: 'rgba(239, 35, 60, 0.2)', borderColor: '#EF233C', color: '#EF233C' }
+                case "info":
+                    return { backgroundColor: 'rgba(141, 153, 174, 0.2)', borderColor: '#8D99AE', color: '#8D99AE' }
+                case "neutral":
+                    return { backgroundColor: 'rgba(43, 45, 66, 0.2)', borderColor: '#2B2D42', color: '#EDF2F4' }
+                default:
+                    return { backgroundColor: 'rgba(43, 45, 66, 0.2)', borderColor: '#2B2D42', color: '#EDF2F4' }
+            }
+        }
+
         return (
             <div
                 ref={ref}
+                style={getBadgeStyles()}
                 className={cn(
                     "inline-flex items-center font-medium rounded-full border",
                     {
                         "px-2 py-1 text-xs": size === "sm",
                         "px-3 py-1 text-sm": size === "md",
                         "px-4 py-2 text-base": size === "lg",
-                    },
-                    {
-                        "bg-green-900/30 border-green-700 text-green-300": variant === "success",
-                        "bg-yellow-900/30 border-yellow-700 text-yellow-300": variant === "warning",
-                        "bg-red-900/30 border-red-700 text-red-300": variant === "danger",
-                        "bg-blue-900/30 border-blue-700 text-blue-300": variant === "info",
-                        "bg-gray-800/30 border-gray-600 text-gray-300": variant === "neutral",
                     },
                     className
                 )}

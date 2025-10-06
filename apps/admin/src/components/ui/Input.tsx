@@ -8,19 +8,47 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
     ({ className, variant = "default", isError, type, ...props }, ref) => {
+        const getInputStyles = () => {
+            if (isError) {
+                return {
+                    backgroundColor: 'rgba(43, 45, 66, 0.3)',
+                    borderColor: '#EF233C',
+                    color: '#EDF2F4'
+                }
+            }
+
+            switch (variant) {
+                case "default":
+                    return {
+                        backgroundColor: 'rgba(43, 45, 66, 0.5)',
+                        borderColor: '#8D99AE',
+                        color: '#EDF2F4'
+                    }
+                case "elegant":
+                    return {
+                        backgroundColor: 'rgba(43, 45, 66, 0.3)',
+                        borderColor: '#8D99AE',
+                        color: '#EDF2F4',
+                        backdropFilter: 'blur(10px)'
+                    }
+                default:
+                    return {
+                        backgroundColor: 'rgba(43, 45, 66, 0.5)',
+                        borderColor: '#8D99AE',
+                        color: '#EDF2F4'
+                    }
+            }
+        }
+
         return (
             <input
                 type={type}
+                style={getInputStyles()}
                 className={cn(
-                    "flex w-full px-4 py-3 text-white placeholder-gray-500 transition-all duration-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                    "flex w-full px-4 py-3 transition-all duration-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 border rounded-lg placeholder-blue-gray",
                     {
-                        "bg-gray-900 border border-gray-700 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500":
-                            variant === "default",
-                        "bg-gray-950/50 border border-gray-800 rounded-xl backdrop-blur-sm focus:border-white focus:ring-2 focus:ring-white/20 focus:bg-gray-900/50":
-                            variant === "elegant",
-                    },
-                    {
-                        "border-red-500 focus:border-red-500 focus:ring-red-500": isError,
+                        "focus:border-opacity-80 focus:ring-1": variant === "default",
+                        "rounded-xl focus:ring-2": variant === "elegant",
                     },
                     className
                 )}

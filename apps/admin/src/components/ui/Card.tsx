@@ -7,20 +7,47 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
     ({ className, variant = "default", ...props }, ref) => {
+        const getCardStyles = () => {
+            switch (variant) {
+                case "default":
+                    return {
+                        backgroundColor: 'rgba(43, 45, 66, 0.3)',
+                        borderColor: '#8D99AE',
+                        backdropFilter: 'blur(10px)'
+                    }
+                case "elevated":
+                    return {
+                        background: 'linear-gradient(135deg, #2B2D42 0%, rgba(43, 45, 66, 0.8) 100%)',
+                        borderColor: '#8D99AE'
+                    }
+                case "feature":
+                    return {
+                        background: 'linear-gradient(135deg, rgba(255, 159, 28, 0.1) 0%, rgba(239, 35, 60, 0.1) 100%)',
+                        borderColor: '#FF9F1C',
+                        backdropFilter: 'blur(10px)'
+                    }
+                case "glass":
+                    return {
+                        backgroundColor: 'rgba(237, 242, 244, 0.1)',
+                        borderColor: 'rgba(237, 242, 244, 0.2)',
+                        backdropFilter: 'blur(20px)'
+                    }
+                default:
+                    return { backgroundColor: 'rgba(43, 45, 66, 0.3)', borderColor: '#8D99AE' }
+            }
+        }
+
         return (
             <div
                 ref={ref}
+                style={getCardStyles()}
                 className={cn(
-                    "rounded-xl p-6 transition-all duration-300",
+                    "rounded-xl p-6 border transition-all duration-300",
                     {
-                        "bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700":
-                            variant === "default",
-                        "bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 shadow-2xl hover:shadow-3xl transform hover:scale-105":
-                            variant === "elevated",
-                        "bg-gradient-to-br from-blue-900/20 to-indigo-900/20 border border-blue-800/50 backdrop-blur-sm":
-                            variant === "feature",
-                        "bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl":
-                            variant === "glass",
+                        "hover:border-opacity-80": variant === "default",
+                        "shadow-2xl hover:shadow-3xl transform hover:scale-105": variant === "elevated",
+                        "": variant === "feature",
+                        "shadow-2xl": variant === "glass",
                     },
                     className
                 )}
@@ -47,7 +74,8 @@ const CardTitle = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingEle
     ({ className, ...props }, ref) => (
         <h3
             ref={ref}
-            className={cn("text-xl font-semibold text-white", className)}
+            className={cn("text-xl font-semibold", className)}
+            style={{ color: '#EDF2F4' }}
             {...props}
         />
     )
@@ -58,7 +86,8 @@ const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLPara
     ({ className, ...props }, ref) => (
         <p
             ref={ref}
-            className={cn("text-gray-400", className)}
+            className={cn("", className)}
+            style={{ color: '#8D99AE' }}
             {...props}
         />
     )

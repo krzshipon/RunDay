@@ -9,8 +9,26 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant = "primary", size = "md", isLoading, children, ...props }, ref) => {
+        const getButtonStyles = () => {
+            switch (variant) {
+                case "primary":
+                    return { backgroundColor: '#FF9F1C', color: '#2B2D42' }
+                case "secondary":
+                    return { backgroundColor: 'transparent', borderColor: '#8D99AE', color: '#8D99AE' }
+                case "accent":
+                    return { backgroundColor: '#EDF2F4', color: '#2B2D42' }
+                case "danger":
+                    return { backgroundColor: '#EF233C', color: '#EDF2F4' }
+                case "ghost":
+                    return { backgroundColor: 'transparent', color: '#8D99AE' }
+                default:
+                    return { backgroundColor: '#FF9F1C', color: '#2B2D42' }
+            }
+        }
+
         return (
             <button
+                style={getButtonStyles()}
                 className={cn(
                     "inline-flex items-center justify-center font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed",
                     {
@@ -19,15 +37,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                         "px-8 py-4 text-lg rounded-xl": size === "lg",
                     },
                     {
-                        "bg-white text-black hover:bg-gray-100 focus:ring-white shadow-lg hover:shadow-xl transform hover:scale-105":
+                        "hover:opacity-90 focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-105":
                             variant === "primary",
-                        "bg-transparent border-2 border-gray-600 text-gray-200 hover:border-white hover:text-white focus:ring-gray-500":
+                        "border-2 hover:opacity-90 focus:ring-2":
                             variant === "secondary",
-                        "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 focus:ring-blue-500 shadow-lg hover:shadow-xl":
+                        "hover:opacity-90 focus:ring-2 shadow-lg hover:shadow-xl":
                             variant === "accent",
-                        "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 focus:ring-red-500 shadow-lg":
+                        "hover:opacity-90 focus:ring-2 shadow-lg":
                             variant === "danger",
-                        "bg-transparent text-gray-300 hover:text-white hover:bg-gray-800 focus:ring-gray-600":
+                        "hover:opacity-80 focus:ring-2":
                             variant === "ghost",
                     },
                     className

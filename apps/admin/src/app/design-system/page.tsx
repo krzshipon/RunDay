@@ -9,47 +9,52 @@ export default function DesignSystem() {
     const sampleStatuses = ['active', 'pending', 'cancelled', 'draft']
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-gray-900 to-black text-white">
-            <div className="container mx-auto p-8 space-y-12">
-
+        <div className="min-h-screen text-white" style={{ background: 'linear-gradient(135deg, #2B2D42 0%, #8D99AE 50%, #2B2D42 100%)' }}>
+            <div className="container mx-auto p-8 space-y-12">                {/* Header */}
                 {/* Header */}
                 <div className="text-center space-y-4">
-                    <h1 className="text-6xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                    <h1 className="text-6xl font-bold" style={{ background: 'linear-gradient(135deg, #EDF2F4 0%, #FF9F1C 50%, #EDF2F4 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                         RunDay Design System
                     </h1>
-                    <p className="text-xl text-gray-400">
-                        Elegant, Modern & Material Design Components
+                    <p className="text-xl" style={{ color: '#8D99AE' }}>
+                        Professional Running Event Platform - Clean & Athletic Design
                     </p>
-                </div>
-
-                {/* Color Palette */}
+                </div>                {/* Color Palette */}
                 <section className="space-y-6">
-                    <h2 className="text-3xl font-semibold text-gray-100">Color Palette</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <h2 className="text-3xl font-semibold text-gray-100">New Color Palette Test</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                         <div className="space-y-2">
-                            <div className="h-20 bg-slate-950 rounded-lg border border-gray-800"></div>
-                            <p className="text-sm text-gray-400">Primary Black</p>
-                            <code className="text-xs text-gray-500">slate-950</code>
+                            <div className="h-20 rounded-lg border border-gray-600" style={{ backgroundColor: '#2B2D42' }}></div>
+                            <p className="text-sm text-gray-400">Primary Navy</p>
+                            <code className="text-xs text-gray-500">#2B2D42</code>
                         </div>
                         <div className="space-y-2">
-                            <div className="h-20 bg-gray-900 rounded-lg border border-gray-700"></div>
-                            <p className="text-sm text-gray-400">Secondary Gray</p>
-                            <code className="text-xs text-gray-500">gray-900</code>
+                            <div className="h-20 rounded-lg border border-gray-600" style={{ backgroundColor: '#8D99AE' }}></div>
+                            <p className="text-sm text-gray-400">Blue Gray</p>
+                            <code className="text-xs text-gray-500">#8D99AE</code>
                         </div>
                         <div className="space-y-2">
-                            <div className="h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg"></div>
-                            <p className="text-sm text-gray-400">Accent Blue</p>
-                            <code className="text-xs text-gray-500">blue-600</code>
+                            <div className="h-20 rounded-lg border border-gray-600" style={{ backgroundColor: '#EDF2F4' }}></div>
+                            <p className="text-sm text-gray-400">Off White</p>
+                            <code className="text-xs text-gray-500">#EDF2F4</code>
                         </div>
                         <div className="space-y-2">
-                            <div className="h-20 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg"></div>
-                            <p className="text-sm text-gray-400">Success Green</p>
-                            <code className="text-xs text-gray-500">green-600</code>
+                            <div className="h-20 rounded-lg border border-gray-600" style={{ backgroundColor: '#FF9F1C' }}></div>
+                            <p className="text-sm text-gray-400">Accent Orange</p>
+                            <code className="text-xs text-gray-500">#FF9F1C</code>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="h-20 rounded-lg border border-gray-600" style={{ backgroundColor: '#EF233C' }}></div>
+                            <p className="text-sm text-gray-400">Accent Red</p>
+                            <code className="text-xs text-gray-500">#EF233C</code>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="h-20 rounded-lg border border-gray-600" style={{ backgroundColor: '#D80032' }}></div>
+                            <p className="text-sm text-gray-400">Dark Red</p>
+                            <code className="text-xs text-gray-500">#D80032</code>
                         </div>
                     </div>
-                </section>
-
-                {/* Buttons */}
+                </section>                {/* Buttons */}
                 <section className="space-y-6">
                     <h2 className="text-3xl font-semibold text-gray-100">Buttons</h2>
 
@@ -81,10 +86,44 @@ export default function DesignSystem() {
                                 <Button variant="secondary" disabled>Disabled</Button>
                             </div>
                         </div>
-                    </div>
-                </section>
 
-                {/* Cards */}
+                        <div>
+                            <h3 className="text-lg font-medium text-gray-300 mb-3">New Color Scheme Test</h3>
+                            <div className="flex flex-wrap gap-4">
+                                <button
+                                    className="px-6 py-3 font-semibold rounded-lg transition-all duration-200 hover:scale-105"
+                                    style={{ backgroundColor: '#EDF2F4', color: '#2B2D42' }}
+                                >
+                                    Light Primary
+                                </button>
+                                <button
+                                    className="px-6 py-3 font-semibold rounded-lg transition-all duration-200 hover:scale-105"
+                                    style={{ backgroundColor: '#FF9F1C', color: '#2B2D42' }}
+                                >
+                                    Orange Accent
+                                </button>
+                                <button
+                                    className="px-6 py-3 font-semibold rounded-lg transition-all duration-200 hover:scale-105 border-2"
+                                    style={{ backgroundColor: 'transparent', color: '#8D99AE', borderColor: '#8D99AE' }}
+                                >
+                                    Blue Gray Outline
+                                </button>
+                                <button
+                                    className="px-6 py-3 font-semibold rounded-lg transition-all duration-200 hover:scale-105"
+                                    style={{ backgroundColor: '#EF233C', color: '#EDF2F4' }}
+                                >
+                                    Red Accent
+                                </button>
+                                <button
+                                    className="px-6 py-3 font-semibold rounded-lg transition-all duration-200 hover:scale-105"
+                                    style={{ backgroundColor: '#D80032', color: '#EDF2F4' }}
+                                >
+                                    Dark Red
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>                {/* Cards */}
                 <section className="space-y-6">
                     <h2 className="text-3xl font-semibold text-gray-100">Cards</h2>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -146,9 +185,38 @@ export default function DesignSystem() {
                         </Card>
 
                     </div>
-                </section>
 
-                {/* Form Elements */}
+                    {/* New Color Scheme Cards Test */}
+                    <div className="grid md:grid-cols-2 gap-6 mt-8">
+                        <div
+                            className="rounded-xl p-6 border transition-all duration-300 hover:scale-105"
+                            style={{ backgroundColor: '#2B2D42', borderColor: '#8D99AE' }}
+                        >
+                            <h3 className="text-xl font-semibold mb-2" style={{ color: '#EDF2F4' }}>Navy Primary Card</h3>
+                            <p className="mb-4" style={{ color: '#8D99AE' }}>Card with navy background and blue-gray text.</p>
+                            <button
+                                className="px-4 py-2 rounded font-medium transition-colors"
+                                style={{ backgroundColor: '#EF233C', color: '#EDF2F4' }}
+                            >
+                                Red Action
+                            </button>
+                        </div>
+
+                        <div
+                            className="rounded-xl p-6 border transition-all duration-300 hover:scale-105"
+                            style={{ backgroundColor: '#EDF2F4', borderColor: '#8D99AE' }}
+                        >
+                            <h3 className="text-xl font-semibold mb-2" style={{ color: '#2B2D42' }}>Light Background Card</h3>
+                            <p className="mb-4" style={{ color: '#8D99AE' }}>Light card with dark text for contrast.</p>
+                            <button
+                                className="px-4 py-2 rounded font-medium transition-colors"
+                                style={{ backgroundColor: '#D80032', color: '#EDF2F4' }}
+                            >
+                                Dark Red Action
+                            </button>
+                        </div>
+                    </div>
+                </section>                {/* Form Elements */}
                 <section className="space-y-6">
                     <h2 className="text-3xl font-semibold text-gray-100">Form Elements</h2>
                     <div className="grid md:grid-cols-2 gap-8">
