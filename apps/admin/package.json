@@ -13,14 +13,15 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "next": "15.5.4",
-    "@runday/ui": "file:../../packages/ui",
     "@runday/database": "file:../../packages/database",
     "@runday/auth": "file:../../packages/auth",
     "@supabase/supabase-js": "^2.38.0",
     "react-hook-form": "^7.47.0",
     "zod": "^3.22.0",
     "date-fns": "^2.30.0",
-    "lucide-react": "^0.292.0"
+    "lucide-react": "^0.292.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {
     "typescript": "^5",
