@@ -18,7 +18,7 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/70 transition-all duration-200">
                             <div className="flex items-center">
-                                <div className="p-3 bg-gradient-to-r from-[#FF9F1C] to-orange-500 rounded-xl shadow-lg">
+                                <div className="p-3 bg-gradient-to-r from-[#FF9F1C] to-amber-500 rounded-xl shadow-lg">
                                     <Calendar className="h-6 w-6 text-white" />
                                 </div>
                                 <div className="ml-4">
@@ -65,7 +65,7 @@ export default function DashboardPage() {
                                         <p className="text-sm text-slate-300">Dec 15, 2024 • Central Park</p>
                                     </div>
                                 </div>
-                                <span className="px-3 py-1 bg-gradient-to-r from-[#FF9F1C] to-orange-500 text-white rounded-full text-sm shadow-md">
+                                <span className="px-3 py-1 bg-gradient-to-r from-[#FF9F1C] to-amber-500 text-white rounded-full text-sm shadow-md">
                                     Registered
                                 </span>
                             </div>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
                                 </div>
                                 <Button
                                     size="sm"
-                                    className="bg-gradient-to-r from-[#FF9F1C] to-orange-500 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-lg"
+                                    className="bg-gradient-to-r from-[#FF9F1C] to-amber-500 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg"
                                 >
                                     Register
                                 </Button>

@@ -11,6 +11,66 @@ interface NavigationItemComponentProps {
     theme?: ThemeConfig;
 }
 
+// Sub-navigation item component for child items
+function SubNavigationItem({ item, pathname, onNavigate, theme }: NavigationItemComponentProps) {
+    const isActive = item.isActive ?? (pathname === item.href || pathname.startsWith(item.href + '/'));
+    const isDark = theme?.variant === 'dark';
+
+    const handleNavigation = (e: React.MouseEvent, href: string) => {
+        e.preventDefault();
+        if (onNavigate) {
+            onNavigate(href);
+        } else {
+            window.location.href = href;
+        }
+    };
+
+    const activeSubClass = isDark
+        ? 'text-[#FF9F1C] bg-gradient-to-r from-slate-700/80 to-slate-600/60 border-l-3 border-[#FF9F1C] shadow-md'
+        : 'text-[#FF9F1C] bg-gradient-to-r from-[#FF9F1C]/8 to-orange-500/5 border-l-3 border-[#FF9F1C]';
+
+    const inactiveSubClass = isDark
+        ? 'text-slate-400 hover:text-slate-200 hover:bg-gradient-to-r hover:from-slate-700/50 hover:to-slate-600/30 border-l-3 border-slate-600/50 hover:border-slate-500'
+        : 'text-[#8D99AE] hover:text-[#2B2D42] hover:bg-gradient-to-r hover:from-[#FF9F1C]/5 hover:to-orange-500/3 border-l-3 border-slate-300/50 hover:border-slate-400';
+
+    return (
+        <div className="relative">
+            {/* Connection line */}
+            <div className={`absolute left-4 -top-1 w-px h-3 ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`} />
+
+            {/* Horizontal connection */}
+            <div className={`absolute left-4 top-3 w-4 h-px ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`} />
+
+            <div
+                className={`flex items-center px-6 py-2 text-xs font-normal rounded-lg transition-all duration-200 ml-6 mr-2 relative ${isActive ? activeSubClass : inactiveSubClass
+                    }`}
+            >
+                <a
+                    href={item.href}
+                    onClick={(e) => handleNavigation(e, item.href)}
+                    className="flex items-center w-full cursor-pointer"
+                >
+                    {/* Small dot indicator */}
+                    <div className={`w-1.5 h-1.5 rounded-full mr-3 flex-shrink-0 ${isActive
+                        ? 'bg-[#FF9F1C]'
+                        : isDark
+                            ? 'bg-slate-500'
+                            : 'bg-slate-400'
+                        }`} />
+
+                    <item.icon className="mr-4 h-3.5 w-3.5 opacity-80" />
+                    <span className="flex-1 text-xs font-medium">{item.label}</span>
+                    {item.badge && (
+                        <span className="ml-2 px-1.5 py-0.5 text-xs bg-[#FF9F1C]/80 text-white rounded-full shadow-sm text-[10px]">
+                            {item.badge}
+                        </span>
+                    )}
+                </a>
+            </div>
+        </div>
+    );
+}
+
 function NavigationItemComponent({ item, pathname, onNavigate, theme }: NavigationItemComponentProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const isActive = item.isActive ?? (pathname === item.href || pathname.startsWith(item.href + '/'));
@@ -77,16 +137,28 @@ function NavigationItemComponent({ item, pathname, onNavigate, theme }: Navigati
             </div>
 
             {hasChildren && isExpanded && (
-                <div className="ml-6 mt-1 space-y-1 animate-in slide-in-from-top-2 duration-200">
-                    {item.children!.map((child) => (
-                        <NavigationItemComponent
-                            key={child.id}
-                            item={child}
-                            pathname={pathname}
-                            onNavigate={onNavigate}
-                            theme={theme}
-                        />
-                    ))}
+                <div className="mt-2 mb-1 relative">
+                    {/* Vertical connection line */}
+                    <div className={`absolute left-6 top-0 bottom-2 w-px ${theme?.variant === 'dark' ? 'bg-slate-600' : 'bg-slate-300'
+                        }`} />
+
+                    <div className="space-y-0.5 animate-in slide-in-from-top-2 duration-200">
+                        {item.children!.map((child, index) => (
+                            <div key={child.id} className="relative">
+                                <SubNavigationItem
+                                    item={child}
+                                    pathname={pathname}
+                                    onNavigate={onNavigate}
+                                    theme={theme}
+                                />
+                                {/* Bottom connection for last item */}
+                                {index === item.children!.length - 1 && (
+                                    <div className={`absolute left-6 top-4 w-px h-2 ${theme?.variant === 'dark' ? 'bg-slate-600' : 'bg-slate-300'
+                                        }`} />
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
         </div>
@@ -114,36 +186,22 @@ export function Sidebar({
         : 'bg-white/95 backdrop-blur-sm shadow-sm border-[#8D99AE]/20';
 
     return (
-        <>
-            {/* Mobile overlay */}
-            {isOpen && (
-                <div
-                    className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-                    onClick={onClose}
-                />
-            )}
-
-            <aside className={`
-                w-64 ${sidebarClass} border-r transition-transform duration-300 ease-in-out z-50
-                ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-                lg:translate-x-0 lg:static lg:z-auto
-                fixed top-16 bottom-0 left-0
-                ${className}
-            `}>
-                <nav className="mt-8 px-4 pb-4 h-full overflow-y-auto">
-                    <div className="space-y-2">
-                        {navigation.map((item) => (
-                            <NavigationItemComponent
-                                key={item.id}
-                                item={item}
-                                pathname={currentPath}
-                                onNavigate={onNavigate}
-                                theme={theme}
-                            />
-                        ))}
-                    </div>
-                </nav>
-            </aside>
-        </>
+        <aside className={`
+            w-72 ${sidebarClass} border-r flex-shrink-0 ${className}
+        `}>
+            <nav className="mt-8 px-4 pb-4 h-full overflow-y-auto">
+                <div className="space-y-2">
+                    {navigation.map((item) => (
+                        <NavigationItemComponent
+                            key={item.id}
+                            item={item}
+                            pathname={currentPath}
+                            onNavigate={onNavigate}
+                            theme={theme}
+                        />
+                    ))}
+                </div>
+            </nav>
+        </aside>
     );
 }

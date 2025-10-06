@@ -10,10 +10,8 @@ export function MainContent({ children, className = '', theme }: MainContentProp
         : 'bg-gradient-to-br from-[#EDF2F7] to-white text-[#2B2D42]';
 
     return (
-        <main className={`flex-1 p-4 lg:p-8 overflow-y-auto ${contentClass} ${className}`}>
-            <div className="max-w-7xl mx-auto">
-                {children}
-            </div>
+        <main className={`p-4 lg:p-8 w-full ${contentClass} ${className}`}>
+            {children}
         </main>
     );
 }

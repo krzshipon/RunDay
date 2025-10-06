@@ -46,21 +46,19 @@ export function DashboardLayout({
                 user={config.user}
                 onSignOut={config.onSignOut}
                 theme={theme}
-                onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-                isSidebarOpen={isSidebarOpen}
             />
 
-            <div className="flex relative">
+            <div className="flex h-[calc(100vh-4rem)]">
                 <Sidebar
                     navigation={config.navigation}
                     currentPath={currentPath}
                     onNavigate={handleNavigate}
                     theme={theme}
-                    isOpen={isSidebarOpen}
+                    isOpen={true}
                     onClose={() => setIsSidebarOpen(false)}
                 />
 
-                <MainContent theme={theme}>
+                <MainContent theme={theme} className="flex-1 overflow-y-auto">
                     {children}
                 </MainContent>
             </div>

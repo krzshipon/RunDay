@@ -28,26 +28,7 @@ export function Header({
         <header className={`${headerClass} border-b sticky top-0 z-50 ${className}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center space-x-4">
-                        {/* Mobile menu button */}
-                        {onToggleSidebar && (
-                            <button
-                                onClick={onToggleSidebar}
-                                className={`lg:hidden p-2 rounded-lg hover:bg-opacity-10 transition-colors ${isDark ? 'hover:bg-white text-white' : 'hover:bg-black text-[#2B2D42]'
-                                    }`}
-                            >
-                                {isSidebarOpen ? (
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                ) : (
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
-                                )}
-                            </button>
-                        )}
-
+                    <div className="flex items-center ml-6">
                         <div className="flex-shrink-0 flex items-center">
                             {logoUrl ? (
                                 <img src={logoUrl} alt={title} className="w-8 h-8" />
@@ -58,11 +39,11 @@ export function Header({
                                     </span>
                                 </div>
                             )}
-                            <span className={`ml-2 text-xl font-bold ${textClass} hidden sm:block`}>{title}</span>
+                            <span className={`ml-4 text-xl font-bold ${textClass}`}>{title}</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-4 mr-6">
                         <div className="hidden md:flex flex-col items-end">
                             <span className={`text-sm ${secondaryTextClass}`}>
                                 Welcome, {user.name || user.email.split('@')[0]}
@@ -92,8 +73,8 @@ export function Header({
                             size="sm"
                             onClick={onSignOut}
                             className={`flex items-center gap-2 ${isDark
-                                    ? 'border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white bg-slate-700/50'
-                                    : ''
+                                ? 'border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white bg-slate-700/50'
+                                : ''
                                 }`}
                         >
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
