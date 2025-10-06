@@ -10,27 +10,25 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@runday/database": "file:../../packages/database",
+    "@runday/ui": "file:../../packages/ui",
+    "@supabase/supabase-js": "^2.38.0",
+    "date-fns": "^2.30.0",
+    "lucide-react": "^0.292.0",
+    "next": "15.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.4",
-    "@runday/ui": "file:../../packages/ui",
-    "@runday/database": "file:../../packages/database",
-    "@runday/auth": "file:../../packages/auth",
-    "@supabase/supabase-js": "^2.38.0",
-    "react-hook-form": "^7.47.0",
-    "zod": "^3.22.0",
-    "date-fns": "^2.30.0",
-    "lucide-react": "^0.292.0"
+    "react-hook-form": "^7.47.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
-    "@eslint/eslintrc": "^3"
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5"
   }
 }
