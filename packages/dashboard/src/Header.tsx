@@ -10,52 +10,96 @@ export function Header({
     logoUrl,
     user,
     onSignOut,
-    className = ''
+    className = '',
+    theme,
+    onToggleSidebar,
+    isSidebarOpen = false
 }: HeaderProps) {
+    const isDark = theme?.variant === 'dark';
+
+    const headerClass = isDark
+        ? 'bg-slate-800/90 backdrop-blur-sm border-slate-700/50 shadow-lg'
+        : 'bg-white/90 backdrop-blur-sm border-[#8D99AE]/20 shadow-sm';
+
+    const textClass = isDark ? 'text-white' : 'text-[#2B2D42]';
+    const secondaryTextClass = isDark ? 'text-slate-300' : 'text-[#8D99AE]';
+
     return (
-        <header className={`bg-white border-b border-[#8D99AE]/20 ${className}`}>
+        <header className={`${headerClass} border-b sticky top-0 z-50 ${className}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center">
+                    <div className="flex items-center space-x-4">
+                        {/* Mobile menu button */}
+                        {onToggleSidebar && (
+                            <button
+                                onClick={onToggleSidebar}
+                                className={`lg:hidden p-2 rounded-lg hover:bg-opacity-10 transition-colors ${isDark ? 'hover:bg-white text-white' : 'hover:bg-black text-[#2B2D42]'
+                                    }`}
+                            >
+                                {isSidebarOpen ? (
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                ) : (
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                )}
+                            </button>
+                        )}
+
                         <div className="flex-shrink-0 flex items-center">
                             {logoUrl ? (
                                 <img src={logoUrl} alt={title} className="w-8 h-8" />
                             ) : (
-                                <div className="w-8 h-8 bg-[#FF9F1C] rounded-full flex items-center justify-center">
+                                <div className="w-8 h-8 bg-gradient-to-r from-[#FF9F1C] to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                                     <span className="text-sm font-bold text-white">
                                         {logoText.charAt(0).toUpperCase()}
                                     </span>
                                 </div>
                             )}
-                            <span className="ml-2 text-xl font-bold text-[#2B2D42]">{title}</span>
+                            <span className={`ml-2 text-xl font-bold ${textClass} hidden sm:block`}>{title}</span>
                         </div>
                     </div>
+
                     <div className="flex items-center space-x-4">
-                        <div className="flex flex-col items-end">
-                            <span className="text-sm text-[#8D99AE]">
-                                Welcome, {user.name || user.email}
+                        <div className="hidden md:flex flex-col items-end">
+                            <span className={`text-sm ${secondaryTextClass}`}>
+                                Welcome, {user.name || user.email.split('@')[0]}
                             </span>
                             {user.role && (
-                                <span className="text-xs text-[#8D99AE] capitalize">
+                                <span className={`text-xs ${secondaryTextClass} capitalize`}>
                                     {user.role}
                                 </span>
                             )}
                         </div>
-                        {user.avatar && (
+
+                        {user.avatar ? (
                             <img
                                 src={user.avatar}
                                 alt={user.name || user.email}
-                                className="w-8 h-8 rounded-full"
+                                className="w-8 h-8 rounded-full ring-2 ring-[#FF9F1C] ring-opacity-50"
                             />
+                        ) : (
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${isDark ? 'bg-slate-600 text-white' : 'bg-[#EDF2F4] text-[#2B2D42]'
+                                }`}>
+                                {(user.name || user.email).charAt(0).toUpperCase()}
+                            </div>
                         )}
+
                         <Button
                             variant="secondary"
                             size="sm"
                             onClick={onSignOut}
-                            className="flex items-center gap-2"
+                            className={`flex items-center gap-2 ${isDark
+                                    ? 'border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white bg-slate-700/50'
+                                    : ''
+                                }`}
                         >
-                            <LogOut className="h-4 w-4" />
-                            Sign Out
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span className="hidden sm:inline">Sign Out</span>
                         </Button>
                     </div>
                 </div>

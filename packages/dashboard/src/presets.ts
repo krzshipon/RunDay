@@ -145,6 +145,21 @@ export function createUserDashboardConfig(
             role: 'user',
         },
         onSignOut,
+        theme: {
+            variant: 'dark',
+            colors: {
+                primary: '#FF9F1C',
+                secondary: '#64748B',
+                accent: '#F59E0B',
+                background: '#0F172A',
+                surface: '#1E293B',
+                text: {
+                    primary: '#FFFFFF',
+                    secondary: '#94A3B8',
+                },
+                border: '#334155',
+            },
+        },
     };
 }
 
