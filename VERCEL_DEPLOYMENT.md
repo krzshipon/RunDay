@@ -29,10 +29,14 @@ Node.js Version: 18.x
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon key
 - `NODE_ENV`: production
 
-### App-specific URLs (update after deployment):
-- `NEXT_PUBLIC_USER_URL`: https://runday-user-app.vercel.app
-- `NEXT_PUBLIC_ADMIN_URL`: https://runday-admin-app.vercel.app  
+### App-specific URLs (DEPLOYED):
+- `NEXT_PUBLIC_USER_URL`: https://run-day-user.vercel.app
+- `NEXT_PUBLIC_ADMIN_URL`: https://run-day-admin.vercel.app  
 - `NEXT_PUBLIC_APP_URL`: (same as above for each app)
+
+### Live Applications:
+- **User App**: https://run-day-user.vercel.app
+- **Admin App**: https://run-day-admin.vercel.app
 
 ## Auto-Deployment Features:
 ✅ Automatic deployments on main branch push
