@@ -9,6 +9,7 @@ import {
     Star,
     Heart,
     Clock,
+    Award,
     User
 } from 'lucide-react';
 import { NavigationItem, DashboardConfig } from './types';
@@ -88,6 +89,12 @@ export const userNavigation: NavigationItem[] = [
                 icon: Clock,
             },
         ],
+    },
+    {
+        id: 'certificates',
+        label: 'Certificates',
+        href: '/certificates',
+        icon: Award,
     },
     {
         id: 'achievements',

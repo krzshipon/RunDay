@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Button } from '@runday/ui';
-import { Download, FileText, Trophy, Medal, Award } from 'lucide-react';
+import { Download, FileText, Trophy, Medal, Award, RefreshCw } from 'lucide-react';
 import { EventRegistrationData } from '@/lib/event-operations';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { CertificatePreview } from './CertificatePreview';
+import { useCertificateManager } from '@/lib/certificate-manager';
 
 interface CertificateGeneratorProps {
     registration: EventRegistrationData;
@@ -19,10 +20,10 @@ export function CertificateGenerator({
     className = ''
 }: CertificateGeneratorProps) {
     const [isGenerating, setIsGenerating] = useState(false);
+    const [hasExistingCertificate, setHasExistingCertificate] = useState(false);
     const certificateRef = useRef<HTMLDivElement>(null);
     const { user } = useAuth();
-
-    const event = registration.event;
+    const { storeCertificate, getCertificateRecord, getDownloadUrl } = useCertificateManager(); const event = registration.event;
     if (!event || !user || !registration.finish_time) return null;
 
     // Format finish time for display
@@ -55,6 +56,17 @@ export function CertificateGenerator({
     const performanceLevel = getPerformanceLevel();
     const eventDate = new Date(event.event_date);
 
+    // Check for existing certificate on component mount
+    useEffect(() => {
+        const checkExistingCertificate = async () => {
+            if (user?.id) {
+                const record = await getCertificateRecord(registration.id, user.id);
+                setHasExistingCertificate(!!record);
+            }
+        };
+        checkExistingCertificate();
+    }, [registration.id, user?.id, getCertificateRecord]);
+
     const generateCertificate = async () => {
         if (!certificateRef.current) return;
 
@@ -83,8 +95,23 @@ export function CertificateGenerator({
 
             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
 
-            // Generate filename
-            const filename = `RunDay_Certificate_${event.name}_${user.email}.pdf`;
+            // Generate PDF blob for storage
+            const pdfBlob = pdf.output('blob');
+
+            // Store certificate in Supabase if user is logged in
+            if (user?.id) {
+                const storeResult = await storeCertificate(pdfBlob, registration, user.id);
+                if (storeResult.success) {
+                    setHasExistingCertificate(true);
+                    console.log('Certificate stored successfully');
+                } else {
+                    console.error('Failed to store certificate:', storeResult.error);
+                }
+            }
+
+            // Generate filename for download
+            const eventName = event.name.replace(/[^a-zA-Z0-9]/g, '_');
+            const filename = `RunDay_Certificate_${eventName}_${user?.email || 'user'}.pdf`;
 
             // Download the PDF
             pdf.save(filename);
@@ -151,8 +178,17 @@ export function CertificateGenerator({
                     </>
                 ) : (
                     <>
-                        <Download className="h-3 w-3 mr-1" />
-                        Download Certificate
+                        {hasExistingCertificate ? (
+                            <>
+                                <RefreshCw className="h-3 w-3 mr-1" />
+                                Regenerate Certificate
+                            </>
+                        ) : (
+                            <>
+                                <Download className="h-3 w-3 mr-1" />
+                                Download Certificate
+                            </>
+                        )}
                     </>
                 )}
             </Button>
