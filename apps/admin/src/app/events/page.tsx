@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { EventSearchBar, EventCard, EventEditDialog, EventDuplicateButton, EventStatusToggle } from '@runday/ui';
-import { Plus, RefreshCw } from 'lucide-react';
+import { Plus, RefreshCw, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/components/auth/AuthProvider';
 import {
@@ -237,6 +237,7 @@ export default function EventsPage() {
                                                 onDelete={handleDeleteEvent}
                                                 onDuplicate={handleDuplicateEvent}
                                             />
+                                            
                                             {/* Event Status Toggle */}
                                             <EventStatusToggle
                                                 eventId={event.id}
@@ -245,6 +246,17 @@ export default function EventsPage() {
                                                 onStatusChange={handleStatusChange}
                                                 className="px-6 pb-2"
                                             />
+                                            
+                                            {/* Participants Management Button */}
+                                            <div className="px-6 pb-4">
+                                                <Link
+                                                    href={`/events/${event.id}/participants`}
+                                                    className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[#2B2D42] hover:bg-[#2B2D42]/90 text-white rounded-lg transition-colors text-sm"
+                                                >
+                                                    <Users className="h-4 w-4" />
+                                                    Manage Participants ({event.registeredCount || 0})
+                                                </Link>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

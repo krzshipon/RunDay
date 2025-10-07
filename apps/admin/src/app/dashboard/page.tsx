@@ -26,7 +26,7 @@ export default function DashboardPage() {
     const loadDashboardData = async () => {
         setIsLoading(true);
         setError(null);
-        
+
         try {
             const [statsResult, eventsResult] = await Promise.all([
                 getDashboardStats(),
@@ -55,10 +55,10 @@ export default function DashboardPage() {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
         });
     };
 
@@ -184,8 +184,8 @@ export default function DashboardPage() {
                             <div className="p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-semibold text-[#2B2D42]">Recent Events</h3>
-                                    <Link 
-                                        href="/events" 
+                                    <Link
+                                        href="/events"
                                         className="text-sm text-[#FF9F1C] hover:text-[#FF9F1C]/80 transition-colors"
                                     >
                                         View All
@@ -220,8 +220,8 @@ export default function DashboardPage() {
                                         <div className="text-center py-8">
                                             <Calendar className="h-12 w-12 text-[#8D99AE]/30 mx-auto mb-3" />
                                             <p className="text-[#8D99AE] text-sm">No events yet</p>
-                                            <Link 
-                                                href="/events/create" 
+                                            <Link
+                                                href="/events/create"
                                                 className="text-[#FF9F1C] hover:text-[#FF9F1C]/80 text-sm transition-colors"
                                             >
                                                 Create your first event
@@ -236,21 +236,21 @@ export default function DashboardPage() {
                             <div className="p-6">
                                 <h3 className="text-lg font-semibold text-[#2B2D42] mb-4">Quick Actions</h3>
                                 <div className="space-y-3">
-                                    <Link 
+                                    <Link
                                         href="/events/create"
                                         className="block w-full text-left p-3 bg-[#FF9F1C]/5 hover:bg-[#FF9F1C]/10 border border-[#FF9F1C]/20 rounded-lg transition-colors"
                                     >
                                         <p className="font-medium text-[#2B2D42]">Create New Event</p>
                                         <p className="text-sm text-[#8D99AE]">Set up a new running event</p>
                                     </Link>
-                                    <Link 
+                                    <Link
                                         href="/events"
                                         className="block w-full text-left p-3 bg-[#2B2D42]/5 hover:bg-[#2B2D42]/10 border border-[#2B2D42]/20 rounded-lg transition-colors"
                                     >
                                         <p className="font-medium text-[#2B2D42]">Manage Events</p>
                                         <p className="text-sm text-[#8D99AE]">View and edit all events</p>
                                     </Link>
-                                    <button 
+                                    <button
                                         onClick={loadDashboardData}
                                         disabled={isLoading}
                                         className="w-full text-left p-3 bg-[#8D99AE]/5 hover:bg-[#8D99AE]/10 border border-[#8D99AE]/20 rounded-lg transition-colors disabled:opacity-50"
