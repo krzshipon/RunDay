@@ -237,7 +237,7 @@ export default function EventsPage() {
                                                 onDelete={handleDeleteEvent}
                                                 onDuplicate={handleDuplicateEvent}
                                             />
-                                            
+
                                             {/* Event Status Toggle */}
                                             <EventStatusToggle
                                                 eventId={event.id}
@@ -246,7 +246,7 @@ export default function EventsPage() {
                                                 onStatusChange={handleStatusChange}
                                                 className="px-6 pb-2"
                                             />
-                                            
+
                                             {/* Participants Management Button */}
                                             <div className="px-6 pb-4">
                                                 <Link

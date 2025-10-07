@@ -42,12 +42,6 @@ export const adminNavigation: NavigationItem[] = [
         ],
     },
     {
-        id: 'participants',
-        label: 'Participants',
-        href: '/participants',
-        icon: Users,
-    },
-    {
         id: 'reports',
         label: 'Reports',
         href: '/reports',
