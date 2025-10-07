@@ -27,7 +27,7 @@ export default function VerifyEmailPage() {
 
                         <div className="text-center space-y-3">
                             <p className="text-sm text-[#8D99AE]">
-                                Didn't receive the email? Check your spam folder or contact support.
+                                Didn&apos;t receive the email? Check your spam folder or contact support.
                             </p>
 
                             <Link href="/auth/signin">

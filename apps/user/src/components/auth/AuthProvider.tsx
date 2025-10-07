@@ -230,6 +230,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
+    if (typeof window === 'undefined') {
+        // Return default values during SSR
+        return {
+            user: null,
+            session: null,
+            loading: true,
+            isVerified: false,
+            signOut: async () => { }
+        };
+    }
     if (!context) {
         throw new Error('useAuth must be used within an AuthProvider');
     }

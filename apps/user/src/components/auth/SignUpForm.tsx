@@ -88,14 +88,14 @@ export function SignUpForm() {
                         </div>
                         <h1 className="text-2xl font-bold text-[#EDF2F4]">Check Your Email</h1>
                         <p className="mt-2 text-[#8D99AE]">
-                            We've sent you a verification link. Please check your email and click the link to activate your account.
+                            We&apos;ve sent you a verification link. Please check your email and click the link to activate your account.
                         </p>
                     </div>
 
                     <div className="space-y-4">
                         <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg backdrop-blur-sm">
                             <p className="text-sm text-green-400 text-center">
-                                After clicking the verification link, you'll be redirected to sign in.
+                                After clicking the verification link, you&apos;ll be redirected to sign in.
                             </p>
                         </div>
 

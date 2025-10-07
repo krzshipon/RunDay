@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "name": "runday-user-app",
+    "buildCommand": "cd ../.. && npm run build --workspace=apps/user",
+    "devCommand": "cd ../.. && npm run dev --workspace=apps/user",
+    "installCommand": "cd ../.. && npm install",
+    "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+    "framework": "nextjs",
+    "outputDirectory": ".next"
+}

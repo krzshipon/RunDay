@@ -25,8 +25,9 @@ export function CertificateGenerator({
     const [error, setError] = useState<string | null>(null);
     const certificateRef = useRef<HTMLDivElement>(null);
     const { user } = useAuth();
-    const { storeCertificate, getCertificateRecord, getDownloadUrl } = useCertificateManager(); const event = registration.event;
-    if (!event || !user || !registration.finish_time) return null;
+    const { storeCertificate, getCertificateRecord } = useCertificateManager();
+
+    const event = registration.event;
 
     // Format finish time for display
     const formatFinishTime = (timeString: string) => {
@@ -74,6 +75,9 @@ export function CertificateGenerator({
 
         checkExistingCertificate();
     }, [user, registration.id, getCertificateRecord]);
+
+    // Early return after hooks
+    if (!event || !user || !registration.finish_time) return null;
 
     const generateCertificate = async () => {
         if (!certificateRef.current) return;

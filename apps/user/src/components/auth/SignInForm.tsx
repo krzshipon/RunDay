@@ -137,7 +137,7 @@ export function SignInForm() {
                             Forgot your password?
                         </Link>
                         <div>
-                            <span className="text-[#8D99AE]">Don't have an account? </span>
+                            <span className="text-[#8D99AE]">Don&apos;t have an account? </span>
                             <Link href="/auth/signup" className="text-[#FF9F1C] hover:text-[#FF9F1C]/80 transition-colors">
                                 Sign up
                             </Link>
