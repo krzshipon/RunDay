@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
@@ -26,6 +26,11 @@ interface AuthProviderProps {
     children: React.ReactNode;
 }
 
+// Storage keys for persisting auth state
+const AUTH_STORAGE_KEY = 'runday_admin_auth_state';
+const ADMIN_STATUS_KEY = 'runday_admin_status';
+const LAST_AUTH_CHECK_KEY = 'runday_last_auth_check';
+
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
@@ -36,18 +41,67 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const previousUserIdRef = useRef<string | null>(null);
     const isTabVisibleRef = useRef<boolean>(true);
     const lastAuthCheckRef = useRef<number>(Date.now());
+    const preventTabSwitchUpdatesRef = useRef<boolean>(false);
+
+    // Storage utilities
+    const saveAuthState = useCallback((authData: { user: User | null; isAdmin: boolean; lastCheck: number }) => {
+        try {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({
+                userId: authData.user?.id || null,
+                email: authData.user?.email || null,
+                isAdmin: authData.isAdmin,
+                lastCheck: authData.lastCheck
+            }));
+        } catch (error) {
+            console.warn('Failed to save auth state to localStorage:', error);
+        }
+    }, []);
+
+    const loadAuthState = useCallback(() => {
+        try {
+            const saved = localStorage.getItem(AUTH_STORAGE_KEY);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        } catch (error) {
+            console.warn('Failed to load auth state from localStorage:', error);
+        }
+        return null;
+    }, []);
+
+    const clearAuthState = useCallback(() => {
+        try {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+            localStorage.removeItem(ADMIN_STATUS_KEY);
+            localStorage.removeItem(LAST_AUTH_CHECK_KEY);
+        } catch (error) {
+            console.warn('Failed to clear auth state from localStorage:', error);
+        }
+    }, []);
 
     const checkAdminStatus = async (user: User | null, forceCheck: boolean = false) => {
         if (!user) {
             setIsAdmin(false);
+            clearAuthState();
             return false;
         }
 
-        // If we already know the admin status and this isn't a forced check, skip
-        // Also check if this is the same user as before
-        const isSameUser = user.id === previousUserIdRef.current;
-        if (isAdmin && !forceCheck && isSameUser) {
-            console.log('Admin status already known for same user, skipping check');
+        // Check if we have cached admin status for this user
+        const savedState = loadAuthState();
+        const isSameUser = user.id === savedState?.userId && user.id === previousUserIdRef.current;
+        const cacheAge = Date.now() - (savedState?.lastCheck || 0);
+        const cacheValid = cacheAge < 300000; // 5 minutes cache
+
+        // If we have valid cached data and this isn't a forced check, use cache
+        if (savedState && isSameUser && cacheValid && !forceCheck) {
+            console.log('Using cached admin status for user:', user.id);
+            setIsAdmin(savedState.isAdmin);
+            return savedState.isAdmin;
+        }
+
+        // Skip admin check if tab switching prevention is active
+        if (preventTabSwitchUpdatesRef.current && !forceCheck) {
+            console.log('Tab switch prevention active, skipping admin check');
             return isAdmin;
         }
 
@@ -71,6 +125,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
             const isUserAdmin = profile?.role === 'admin';
             console.log('Is admin:', isUserAdmin);
             setIsAdmin(isUserAdmin);
+            
+            // Save to cache
+            const now = Date.now();
+            lastAuthCheckRef.current = now;
+            saveAuthState({ user, isAdmin: isUserAdmin, lastCheck: now });
+            
             return isUserAdmin;
         } catch (error) {
             console.error('Error checking admin status:', error);
@@ -85,6 +145,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Get initial session
         const initializeAuth = async () => {
             try {
+                // First, try to load from cache
+                const savedState = loadAuthState();
+                
                 const { data: { session }, error } = await supabase.auth.getSession();
 
                 if (error) {
@@ -102,13 +165,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 setUser(session?.user ?? null);
 
                 if (session?.user) {
-                    await checkAdminStatus(session.user, true); // Force check on initial load
+                    // Check if we have valid cached data for this user
+                    const isSameUser = session.user.id === savedState?.userId;
+                    const cacheAge = Date.now() - (savedState?.lastCheck || 0);
+                    const cacheValid = cacheAge < 300000; // 5 minutes
+
+                    if (savedState && isSameUser && cacheValid) {
+                        console.log('Using cached admin status on initialization');
+                        setIsAdmin(savedState.isAdmin);
+                        lastAuthCheckRef.current = savedState.lastCheck;
+                    } else {
+                        console.log('Cache invalid or missing, checking admin status');
+                        await checkAdminStatus(session.user, true); // Force check on initial load
+                    }
                 }
 
                 setLoading(false);
                 setIsInitialized(true);
             } catch (error) {
                 console.error('Error initializing auth:', error);
+                clearAuthState();
                 setSession(null);
                 setUser(null);
                 setIsAdmin(false);
@@ -121,19 +197,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         // Handle page visibility changes
         const handleVisibilityChange = () => {
+            const wasVisible = isTabVisibleRef.current;
             isTabVisibleRef.current = !document.hidden;
+            
             console.log('Tab visibility changed:', isTabVisibleRef.current ? 'visible' : 'hidden');
 
-            // When tab becomes visible, don't trigger auth checks if we just did one recently
-            if (isTabVisibleRef.current) {
-                const now = Date.now();
-                const timeSinceLastCheck = now - lastAuthCheckRef.current;
-                console.log('Time since last auth check:', timeSinceLastCheck + 'ms');
-
-                // If we checked auth in the last 5 seconds, skip
-                if (timeSinceLastCheck < 5000) {
-                    console.log('Recent auth check detected, skipping reload on tab focus');
-                }
+            if (isTabVisibleRef.current && !wasVisible) {
+                // Tab became visible - activate prevention for a short period
+                console.log('Tab became visible, activating update prevention');
+                preventTabSwitchUpdatesRef.current = true;
+                
+                // Disable prevention after 3 seconds to allow genuine updates
+                setTimeout(() => {
+                    preventTabSwitchUpdatesRef.current = false;
+                    console.log('Tab switch prevention deactivated');
+                }, 3000);
             }
         };
 
@@ -157,14 +235,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
             const isInitialSession = event === 'INITIAL_SESSION';
             const isTokenRefresh = event === 'TOKEN_REFRESHED';
 
-            // Check if this might be triggered by tab switching
-            const isLikelyTabSwitch = event === 'SIGNED_IN' &&
+            // Enhanced tab switch detection
+            const isLikelyTabSwitch = (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') &&
                 !isUserChanging &&
                 isInitialized &&
-                timeSinceLastCheck < 10000; // Less than 10 seconds since last check
+                (timeSinceLastCheck < 10000 || preventTabSwitchUpdatesRef.current);
+
+            // Skip ALL updates if prevention is active (tab switch scenario)
+            if (preventTabSwitchUpdatesRef.current && !isSignOut && !isUserChanging) {
+                console.log('Tab switch prevention active, completely skipping auth state update. Event:', event);
+                return; // Exit early without any state changes
+            }
 
             // Only show loading for actual user changes, sign out, or initial session
-            // Skip loading for token refreshes and likely tab switches
             const shouldShowLoading = (isUserChanging || isSignOut || (isInitialSession && !isInitialized)) &&
                 !isTokenRefresh &&
                 !isLikelyTabSwitch;
@@ -173,38 +256,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 console.log('User state changing, setting loading to true. Event:', event, 'Previous:', previousUserId, 'New:', newUserId);
                 setLoading(true);
             } else {
-                console.log('Token refresh or tab switch detected, keeping current state. Event:', event, 'User ID unchanged:', newUserId, 'Likely tab switch:', isLikelyTabSwitch);
+                console.log('Token refresh or tab switch detected, maintaining current state. Event:', event, 'User ID unchanged:', newUserId);
             }
 
-            // Update the ref with the new user ID
-            previousUserIdRef.current = newUserId;
+            // Only update refs and state if not a tab switch
+            if (!isLikelyTabSwitch || isUserChanging || isSignOut) {
+                previousUserIdRef.current = newUserId;
+                setSession(session);
+                setUser(session?.user ?? null);
 
-            setSession(session);
-            setUser(session?.user ?? null);
-
-            if (session?.user) {
-                // Force check admin status only for significant changes
-                const forceCheck = shouldShowLoading;
-
-                // Update last auth check time
-                if (forceCheck || !isAdmin) {
-                    lastAuthCheckRef.current = now;
-                    await checkAdminStatus(session.user, forceCheck);
+                if (session?.user) {
+                    // Only check admin status for significant changes
+                    const forceCheck = shouldShowLoading;
+                    
+                    if (forceCheck) {
+                        lastAuthCheckRef.current = now;
+                        await checkAdminStatus(session.user, forceCheck);
+                    }
                 } else {
-                    console.log('Skipping admin check - already verified and not a significant change');
+                    setIsAdmin(false);
+                    clearAuthState();
                 }
-            } else {
-                setIsAdmin(false);
-            }
 
-            // Set loading to false and mark as initialized
-            if (shouldShowLoading) {
-                console.log('Setting loading to false after auth state change');
-                setLoading(false);
-            }
+                // Set loading to false and mark as initialized
+                if (shouldShowLoading) {
+                    console.log('Setting loading to false after auth state change');
+                    setLoading(false);
+                }
 
-            if (!isInitialized) {
-                setIsInitialized(true);
+                if (!isInitialized) {
+                    setIsInitialized(true);
+                }
             }
         });
 
@@ -215,6 +297,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, []);
 
     const signOut = async () => {
+        clearAuthState();
         await supabase.auth.signOut();
     };
 
