@@ -390,8 +390,8 @@ export default function EventDetailsPage() {
                             <button
                                 onClick={() => setActiveTab('overview')}
                                 className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'overview'
-                                        ? 'border-[#FF9F1C] text-[#FF9F1C]'
-                                        : 'border-transparent text-[#8D99AE] hover:text-[#2B2D42] hover:border-[#8D99AE]'
+                                    ? 'border-[#FF9F1C] text-[#FF9F1C]'
+                                    : 'border-transparent text-[#8D99AE] hover:text-[#2B2D42] hover:border-[#8D99AE]'
                                     }`}
                             >
                                 Event Overview
@@ -399,8 +399,8 @@ export default function EventDetailsPage() {
                             <button
                                 onClick={() => setActiveTab('participants')}
                                 className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'participants'
-                                        ? 'border-[#FF9F1C] text-[#FF9F1C]'
-                                        : 'border-transparent text-[#8D99AE] hover:text-[#2B2D42] hover:border-[#8D99AE]'
+                                    ? 'border-[#FF9F1C] text-[#FF9F1C]'
+                                    : 'border-transparent text-[#8D99AE] hover:text-[#2B2D42] hover:border-[#8D99AE]'
                                     }`}
                             >
                                 Participants ({stats.total})

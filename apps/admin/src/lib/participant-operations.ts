@@ -63,10 +63,6 @@ export async function getEventParticipants(eventId: string): Promise<{
           id,
           name,
           event_date
-        ),
-        profiles!inner (
-          id,
-          full_name
         )
       `)
             .eq('event_id', eventId)
@@ -78,18 +74,42 @@ export async function getEventParticipants(eventId: string): Promise<{
             return { success: false, error: error.message };
         }
 
-        // Get user emails from auth.users (we'll need to fetch this separately)
+        // Get user emails and profiles separately
         const userIds = registrations?.map(r => r.user_id) || [];
-        const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
 
-        if (usersError) {
-            console.error('Error fetching user emails:', usersError);
+        // Get user emails from auth
+        let userEmailMap: Record<string, string> = {};
+        try {
+            const { data: users, error: usersError } = await supabase.auth.admin.listUsers();
+            if (!usersError && users?.users) {
+                userEmailMap = users.users.reduce((acc: Record<string, string>, user: any) => {
+                    acc[user.id] = user.email;
+                    return acc;
+                }, {});
+            }
+        } catch (authError) {
+            console.warn('Could not fetch auth users, will use user_id as fallback');
         }
 
-        const userEmailMap = users?.users?.reduce((acc: Record<string, string>, user: any) => {
-            acc[user.id] = user.email;
-            return acc;
-        }, {}) || {};
+        // Get user profiles if they exist
+        let userProfileMap: Record<string, string> = {};
+        if (userIds.length > 0) {
+            try {
+                const { data: profiles, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('id, full_name')
+                    .in('id', userIds);
+
+                if (!profilesError && profiles) {
+                    userProfileMap = profiles.reduce((acc: Record<string, string>, profile: any) => {
+                        acc[profile.id] = profile.full_name;
+                        return acc;
+                    }, {});
+                }
+            } catch (profileError) {
+                console.warn('Could not fetch user profiles');
+            }
+        }
 
         const participants: EventParticipant[] = registrations?.map((registration: any) => ({
             id: registration.id,
@@ -97,8 +117,8 @@ export async function getEventParticipants(eventId: string): Promise<{
             event_name: registration.events?.name || 'Unknown Event',
             event_date: registration.events?.event_date || '',
             user_id: registration.user_id,
-            user_email: userEmailMap[registration.user_id] || 'Unknown',
-            user_name: registration.profiles?.full_name || undefined,
+            user_email: userEmailMap[registration.user_id] || `User-${registration.user_id.slice(0, 8)}`,
+            user_name: userProfileMap[registration.user_id] || undefined,
             bib_number: registration.bib_number || undefined,
             finish_time: registration.finish_time || undefined,
             position: registration.position || undefined,
@@ -142,13 +162,20 @@ export async function updateParticipant(
         }
 
         // Check if user is admin or event creator
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', userId)
-            .single();
+        let isAdmin = false;
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', userId)
+                .single();
 
-        const isAdmin = profile?.role === 'admin';
+            isAdmin = profile?.role === 'admin';
+        } catch (profileError) {
+            // If profiles table doesn't exist or user has no profile, assume not admin
+            console.warn('Could not check user role, assuming non-admin');
+        }
+
         const isEventCreator = (registration as any).events?.created_by === userId;
 
         if (!isAdmin && !isEventCreator) {
@@ -202,13 +229,20 @@ export async function assignBibNumbers(eventId: string, userId: string): Promise
         }
 
         // Check if user is admin or event creator
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', userId)
-            .single();
+        let isAdmin = false;
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', userId)
+                .single();
 
-        const isAdmin = profile?.role === 'admin';
+            isAdmin = profile?.role === 'admin';
+        } catch (profileError) {
+            // If profiles table doesn't exist or user has no profile, assume not admin
+            console.warn('Could not check user role, assuming non-admin');
+        }
+
         const isEventCreator = event.created_by === userId;
 
         if (!isAdmin && !isEventCreator) {
@@ -283,13 +317,20 @@ export async function removeParticipant(
         }
 
         // Check if user is admin or event creator
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', userId)
-            .single();
+        let isAdmin = false;
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', userId)
+                .single();
 
-        const isAdmin = profile?.role === 'admin';
+            isAdmin = profile?.role === 'admin';
+        } catch (profileError) {
+            // If profiles table doesn't exist or user has no profile, assume not admin
+            console.warn('Could not check user role, assuming non-admin');
+        }
+
         const isEventCreator = (registration as any).events?.created_by === userId;
 
         if (!isAdmin && !isEventCreator) {
