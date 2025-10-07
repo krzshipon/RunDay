@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
+import { RegistrationStatus } from '@/components/RegistrationStatus';
 import { Card, Button, Input } from '@runday/ui';
 import {
     Calendar,
@@ -95,22 +96,60 @@ export default function EventsPage() {
         setFilteredEvents(filtered);
     };
 
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    // Auto-clear messages after 5 seconds
+    useEffect(() => {
+        if (successMessage || errorMessage) {
+            const timer = setTimeout(() => {
+                setSuccessMessage(null);
+                setErrorMessage(null);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage, errorMessage]);
+
     const handleRegister = async (eventId: string) => {
         if (!user || isRegistering) return;
 
         setIsRegistering(eventId);
+        setErrorMessage(null);
+        setSuccessMessage(null);
+
         try {
             const result = await registerForEvent(eventId, user.id);
             if (result.success) {
                 // Refresh events to update registration status
                 await loadEvents();
-                alert('Successfully registered for the event!');
+                setSuccessMessage('Successfully registered for the event! 🎉');
             } else {
-                alert(`Registration failed: ${result.error}`);
+                // Handle specific validation errors with better messages
+                let errorMsg = result.error || 'Registration failed';
+
+                switch (result.validationError) {
+                    case 'ALREADY_REGISTERED':
+                        errorMsg = 'You are already registered for this event';
+                        break;
+                    case 'EVENT_FULL':
+                        errorMsg = 'Sorry, this event is full. Try checking back for cancellations.';
+                        break;
+                    case 'EVENT_PAST':
+                        errorMsg = 'Cannot register for past events';
+                        break;
+                    case 'EVENT_CANCELLED':
+                        errorMsg = 'This event has been cancelled';
+                        break;
+                    case 'REGISTRATION_CLOSED':
+                        errorMsg = 'Registration is closed (events close 2 hours before start time)';
+                        break;
+                }
+
+                setErrorMessage(errorMsg);
             }
         } catch (error) {
             console.error('Error registering for event:', error);
-            alert('An unexpected error occurred during registration');
+            setErrorMessage('An unexpected error occurred during registration. Please try again.');
         } finally {
             setIsRegistering(null);
         }
@@ -119,23 +158,22 @@ export default function EventsPage() {
     const handleCancelRegistration = async (eventId: string) => {
         if (!user || isRegistering) return;
 
-        if (!confirm('Are you sure you want to cancel your registration for this event?')) {
-            return;
-        }
-
         setIsRegistering(eventId);
+        setErrorMessage(null);
+        setSuccessMessage(null);
+
         try {
             const result = await cancelRegistration(eventId, user.id);
             if (result.success) {
                 // Refresh events to update registration status
                 await loadEvents();
-                alert('Registration cancelled successfully');
+                setSuccessMessage('Registration cancelled successfully');
             } else {
-                alert(`Cancellation failed: ${result.error}`);
+                setErrorMessage(result.error || 'Failed to cancel registration');
             }
         } catch (error) {
             console.error('Error cancelling registration:', error);
-            alert('An unexpected error occurred during cancellation');
+            setErrorMessage('An unexpected error occurred during cancellation');
         } finally {
             setIsRegistering(null);
         }
@@ -257,7 +295,27 @@ export default function EventsPage() {
                         </div>
                     </div>
 
-                    {/* Error Display */}
+                    {/* Success Message */}
+                    {successMessage && (
+                        <div className="p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <CheckCircle className="h-4 w-4" />
+                                <p className="font-medium">{successMessage}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Error Message */}
+                    {errorMessage && (
+                        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <AlertCircle className="h-4 w-4" />
+                                <p className="font-medium">{errorMessage}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Loading Error Display */}
                     {error && (
                         <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg">
                             <div className="flex items-center gap-2">
@@ -317,37 +375,14 @@ export default function EventsPage() {
                                                 </p>
                                             )}
 
-                                            {/* Registration Status & Action */}
-                                            <div className="flex items-center justify-between">
-                                                {event.isUserRegistered ? (
-                                                    <div className="flex items-center gap-2">
-                                                        <CheckCircle className="h-4 w-4 text-emerald-400" />
-                                                        <span className="text-sm text-emerald-400 font-medium">Registered</span>
-                                                    </div>
-                                                ) : (
-                                                    <div></div>
-                                                )}
-
-                                                {event.isUserRegistered ? (
-                                                    <Button
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        onClick={() => handleCancelRegistration(event.id)}
-                                                        disabled={isRegistering === event.id}
-                                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                                                    >
-                                                        {isRegistering === event.id ? 'Cancelling...' : 'Cancel'}
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        size="sm"
-                                                        onClick={() => handleRegister(event.id)}
-                                                        disabled={!availabilityInfo.available || isRegistering === event.id}
-                                                        className="bg-gradient-to-r from-[#FF9F1C] to-amber-500 hover:from-amber-600 hover:to-amber-700 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    >
-                                                        {isRegistering === event.id ? 'Registering...' : 'Register'}
-                                                    </Button>
-                                                )}
+                                            {/* Enhanced Registration Status */}
+                                            <div className="mt-4">
+                                                <RegistrationStatus
+                                                    event={event}
+                                                    onRegister={() => handleRegister(event.id)}
+                                                    onCancel={() => handleCancelRegistration(event.id)}
+                                                    loading={isRegistering === event.id}
+                                                />
                                             </div>
                                         </div>
                                     </div>

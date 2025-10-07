@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
+import { ResultsCard } from '@/components/ResultsCard';
+import { RegistrationStatus } from '@/components/RegistrationStatus';
 import { Card, Button } from '@runday/ui';
 import {
     Calendar,
@@ -180,8 +182,8 @@ export default function MyEventsPage() {
                             <button
                                 onClick={() => setActiveTab('upcoming')}
                                 className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'upcoming'
-                                        ? 'border-[#FF9F1C] text-[#FF9F1C]'
-                                        : 'border-transparent text-slate-400 hover:text-white hover:border-slate-600'
+                                    ? 'border-[#FF9F1C] text-[#FF9F1C]'
+                                    : 'border-transparent text-slate-400 hover:text-white hover:border-slate-600'
                                     }`}
                             >
                                 Upcoming Events ({upcomingCount})
@@ -189,8 +191,8 @@ export default function MyEventsPage() {
                             <button
                                 onClick={() => setActiveTab('completed')}
                                 className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'completed'
-                                        ? 'border-[#FF9F1C] text-[#FF9F1C]'
-                                        : 'border-transparent text-slate-400 hover:text-white hover:border-slate-600'
+                                    ? 'border-[#FF9F1C] text-[#FF9F1C]'
+                                    : 'border-transparent text-slate-400 hover:text-white hover:border-slate-600'
                                     }`}
                             >
                                 Completed Events ({completedCount})
@@ -201,115 +203,132 @@ export default function MyEventsPage() {
                     {/* Events List */}
                     <div className="space-y-4">
                         {filteredRegistrations.length > 0 ? (
-                            filteredRegistrations.map((registration) => (
-                                <div key={registration.id} className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/70 transition-all duration-200">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            {/* Event Header */}
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <h3 className="text-xl font-semibold text-white">{registration.event?.name}</h3>
-                                                {activeTab === 'completed' && registration.finish_time && (
-                                                    <span className="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-600/20 text-emerald-400 rounded-full text-sm border border-emerald-500/30">
-                                                        <Trophy className="h-3 w-3 inline mr-1" />
-                                                        Finished
-                                                    </span>
+                            filteredRegistrations.map((registration) => {
+                                const eventStatus = getEventStatus(registration.event);
+
+                                // Use ResultsCard for completed events
+                                if (activeTab === 'completed' && eventStatus === 'completed') {
+                                    return (
+                                        <ResultsCard
+                                            key={registration.id}
+                                            registration={registration}
+                                            showPosition={true}
+                                            showStats={true}
+                                        />
+                                    );
+                                }
+
+                                // Use enhanced card for upcoming events
+                                return (
+                                    <div key={registration.id} className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/70 transition-all duration-200">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                {/* Event Header */}
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <h3 className="text-xl font-semibold text-white">{registration.event?.name}</h3>
+                                                    {activeTab === 'completed' && registration.finish_time && (
+                                                        <span className="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-600/20 text-emerald-400 rounded-full text-sm border border-emerald-500/30">
+                                                            <Trophy className="h-3 w-3 inline mr-1" />
+                                                            Finished
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {/* Event Details Grid */}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                                                    <div className="flex items-center gap-2 text-slate-300">
+                                                        <Calendar className="h-4 w-4" />
+                                                        <div>
+                                                            <p className="text-xs text-slate-400">Date</p>
+                                                            <p className="text-sm font-medium">{formatDate(registration.event?.event_date || '')}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 text-slate-300">
+                                                        <MapPin className="h-4 w-4" />
+                                                        <div>
+                                                            <p className="text-xs text-slate-400">Location</p>
+                                                            <p className="text-sm font-medium">{registration.event?.location || 'TBA'}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 text-slate-300">
+                                                        <Clock className="h-4 w-4" />
+                                                        <div>
+                                                            <p className="text-xs text-slate-400">Distance</p>
+                                                            <p className="text-sm font-medium">{registration.event?.distance}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 text-slate-300">
+                                                        <Users className="h-4 w-4" />
+                                                        <div>
+                                                            <p className="text-xs text-slate-400">Bib Number</p>
+                                                            <p className="text-sm font-medium font-mono">
+                                                                {registration.bib_number || 'Not assigned'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Results (for completed events) */}
+                                                {activeTab === 'completed' && (registration.finish_time || registration.position) && (
+                                                    <div className="flex items-center gap-6 p-4 bg-slate-700/30 rounded-lg mb-4">
+                                                        {registration.finish_time && (
+                                                            <div className="text-center">
+                                                                <p className="text-xs text-slate-400">Finish Time</p>
+                                                                <p className="text-lg font-mono font-semibold text-emerald-400">
+                                                                    {formatTime(registration.finish_time)}
+                                                                </p>
+                                                            </div>
+                                                        )}
+                                                        {registration.position && (
+                                                            <div className="text-center">
+                                                                <p className="text-xs text-slate-400">Position</p>
+                                                                <p className="text-lg font-semibold text-amber-400">
+                                                                    #{registration.position}
+                                                                </p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Description */}
+                                                {registration.event?.description && (
+                                                    <p className="text-sm text-slate-400 mt-2">
+                                                        {registration.event.description}
+                                                    </p>
                                                 )}
                                             </div>
 
-                                            {/* Event Details Grid */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                                                <div className="flex items-center gap-2 text-slate-300">
-                                                    <Calendar className="h-4 w-4" />
-                                                    <div>
-                                                        <p className="text-xs text-slate-400">Date</p>
-                                                        <p className="text-sm font-medium">{formatDate(registration.event?.event_date || '')}</p>
-                                                    </div>
-                                                </div>
+                                            {/* Actions */}
+                                            <div className="flex flex-col gap-2 ml-6">
+                                                {activeTab === 'upcoming' && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        onClick={() => handleCancelRegistration(registration.event_id, registration.event?.name || '')}
+                                                        disabled={isUpdating === registration.event_id}
+                                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                                    >
+                                                        {isUpdating === registration.event_id ? 'Cancelling...' : 'Cancel Registration'}
+                                                    </Button>
+                                                )}
 
-                                                <div className="flex items-center gap-2 text-slate-300">
-                                                    <MapPin className="h-4 w-4" />
-                                                    <div>
-                                                        <p className="text-xs text-slate-400">Location</p>
-                                                        <p className="text-sm font-medium">{registration.event?.location || 'TBA'}</p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center gap-2 text-slate-300">
-                                                    <Clock className="h-4 w-4" />
-                                                    <div>
-                                                        <p className="text-xs text-slate-400">Distance</p>
-                                                        <p className="text-sm font-medium">{registration.event?.distance}</p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center gap-2 text-slate-300">
-                                                    <Users className="h-4 w-4" />
-                                                    <div>
-                                                        <p className="text-xs text-slate-400">Bib Number</p>
-                                                        <p className="text-sm font-medium font-mono">
-                                                            {registration.bib_number || 'Not assigned'}
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                                {activeTab === 'completed' && registration.finish_time && (
+                                                    <Button
+                                                        size="sm"
+                                                        className="bg-gradient-to-r from-[#FF9F1C] to-amber-500 hover:from-amber-600 hover:to-amber-700 text-white border-0"
+                                                    >
+                                                        <Download className="h-3 w-3 mr-1" />
+                                                        Certificate
+                                                    </Button>
+                                                )}
                                             </div>
-
-                                            {/* Results (for completed events) */}
-                                            {activeTab === 'completed' && (registration.finish_time || registration.position) && (
-                                                <div className="flex items-center gap-6 p-4 bg-slate-700/30 rounded-lg mb-4">
-                                                    {registration.finish_time && (
-                                                        <div className="text-center">
-                                                            <p className="text-xs text-slate-400">Finish Time</p>
-                                                            <p className="text-lg font-mono font-semibold text-emerald-400">
-                                                                {formatTime(registration.finish_time)}
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                    {registration.position && (
-                                                        <div className="text-center">
-                                                            <p className="text-xs text-slate-400">Position</p>
-                                                            <p className="text-lg font-semibold text-amber-400">
-                                                                #{registration.position}
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {/* Description */}
-                                            {registration.event?.description && (
-                                                <p className="text-sm text-slate-400 mt-2">
-                                                    {registration.event.description}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="flex flex-col gap-2 ml-6">
-                                            {activeTab === 'upcoming' && (
-                                                <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    onClick={() => handleCancelRegistration(registration.event_id, registration.event?.name || '')}
-                                                    disabled={isUpdating === registration.event_id}
-                                                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                                                >
-                                                    {isUpdating === registration.event_id ? 'Cancelling...' : 'Cancel Registration'}
-                                                </Button>
-                                            )}
-
-                                            {activeTab === 'completed' && registration.finish_time && (
-                                                <Button
-                                                    size="sm"
-                                                    className="bg-gradient-to-r from-[#FF9F1C] to-amber-500 hover:from-amber-600 hover:to-amber-700 text-white border-0"
-                                                >
-                                                    <Download className="h-3 w-3 mr-1" />
-                                                    Certificate
-                                                </Button>
-                                            )}
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         ) : (
                             <div className="text-center py-12">
                                 <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-8">

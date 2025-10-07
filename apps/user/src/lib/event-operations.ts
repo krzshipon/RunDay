@@ -108,61 +108,149 @@ export async function getPublicEvents(userId?: string): Promise<{
 }
 
 /**
- * Register user for an event
+ * Register user for an event with enhanced validation
  */
 export async function registerForEvent(eventId: string, userId: string): Promise<{
     success: boolean;
     data?: EventRegistrationData;
     error?: string;
+    validationError?: 'ALREADY_REGISTERED' | 'EVENT_FULL' | 'EVENT_PAST' | 'EVENT_CANCELLED' | 'REGISTRATION_CLOSED';
 }> {
     try {
-        // Check if user is already registered
-        const { data: existingReg } = await supabase
-            .from('registrations')
-            .select('id')
-            .eq('event_id', eventId)
-            .eq('user_id', userId)
-            .single();
-
-        if (existingReg) {
-            return { success: false, error: 'You are already registered for this event' };
-        }
-
-        // Check if event is full
-        const { data: event } = await supabase
+        // First, get event details to validate
+        const { data: event, error: eventError } = await supabase
             .from('events')
-            .select('max_participants')
+            .select('*')
             .eq('id', eventId)
             .single();
 
-        if (event?.max_participants) {
-            const { data: registrations } = await supabase
+        if (eventError) {
+            return { success: false, error: 'Event not found' };
+        }
+
+        // Check if event is cancelled
+        if (event.status === 'cancelled') {
+            return {
+                success: false,
+                error: 'This event has been cancelled',
+                validationError: 'EVENT_CANCELLED'
+            };
+        }
+
+        // Check if event is completed
+        if (event.status === 'completed') {
+            return {
+                success: false,
+                error: 'Cannot register for completed events',
+                validationError: 'EVENT_PAST'
+            };
+        }
+
+        // Check if event date has passed
+        const eventDate = new Date(event.event_date);
+        const now = new Date();
+        if (eventDate < now) {
+            return {
+                success: false,
+                error: 'Cannot register for past events',
+                validationError: 'EVENT_PAST'
+            };
+        }
+
+        // Check if registration is closed (within 2 hours of event)
+        const hoursUntilEvent = (eventDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+        if (hoursUntilEvent < 2) {
+            return {
+                success: false,
+                error: 'Registration closes 2 hours before the event',
+                validationError: 'REGISTRATION_CLOSED'
+            };
+        }
+
+        // Check if user is already registered (with error handling for multiple results)
+        const { data: existingRegs, error: regCheckError } = await supabase
+            .from('registrations')
+            .select('id')
+            .eq('event_id', eventId)
+            .eq('user_id', userId);
+
+        if (regCheckError) {
+            console.error('Error checking existing registration:', regCheckError);
+            return { success: false, error: 'Failed to verify registration status' };
+        }
+
+        if (existingRegs && existingRegs.length > 0) {
+            return {
+                success: false,
+                error: 'You are already registered for this event',
+                validationError: 'ALREADY_REGISTERED'
+            };
+        }
+
+        // Check if event is full (atomic check)
+        if (event.max_participants) {
+            const { data: registrations, error: countError } = await supabase
                 .from('registrations')
-                .select('id')
+                .select('id', { count: 'exact' })
                 .eq('event_id', eventId);
 
-            if (registrations && registrations.length >= event.max_participants) {
-                return { success: false, error: 'This event is full' };
+            if (countError) {
+                console.error('Error counting registrations:', countError);
+                return { success: false, error: 'Failed to check event capacity' };
+            }
+
+            const currentRegistrations = registrations?.length || 0;
+            if (currentRegistrations >= event.max_participants) {
+                return {
+                    success: false,
+                    error: 'This event is full',
+                    validationError: 'EVENT_FULL'
+                };
             }
         }
 
-        // Create registration
-        const { data: registration, error } = await supabase
-            .from('registrations')
-            .insert([{
-                event_id: eventId,
-                user_id: userId,
-                registered_at: new Date().toISOString()
-            }])
-            .select()
-            .single();
+        // Create registration with retry logic for race conditions
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                const { data: registration, error } = await supabase
+                    .from('registrations')
+                    .insert([{
+                        event_id: eventId,
+                        user_id: userId,
+                        registered_at: new Date().toISOString()
+                    }])
+                    .select()
+                    .single();
 
-        if (error) {
-            console.error('Error creating registration:', error);
-            return { success: false, error: error.message };
+                if (error) {
+                    // Handle duplicate registration error from database constraint
+                    if (error.code === '23505') { // PostgreSQL unique constraint violation
+                        return {
+                            success: false,
+                            error: 'You are already registered for this event',
+                            validationError: 'ALREADY_REGISTERED'
+                        };
+                    }
+                    throw error;
+                }
+
+                return { success: true, data: registration };
+            } catch (error) {
+                retries--;
+                if (retries === 0) {
+                    console.error('Error creating registration after retries:', error);
+                    return {
+                        success: false,
+                        error: error instanceof Error ? error.message : 'Registration failed. Please try again.'
+                    };
+                }
+                // Wait briefly before retry
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
         }
 
-        return { success: true, data: registration };
+        return { success: false, error: 'Registration failed after multiple attempts' };
     } catch (error) {
         console.error('Error registering for event:', error);
         return {
