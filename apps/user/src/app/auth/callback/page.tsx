@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Card } from '@runday/ui';
 import { CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import Link from 'next/link';
 
-export default function AuthCallback() {
+function AuthCallbackContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -16,6 +16,12 @@ export default function AuthCallback() {
     useEffect(() => {
         const handleAuthCallback = async () => {
             try {
+                if (!searchParams) {
+                    setError('Invalid callback parameters');
+                    setStatus('error');
+                    return;
+                }
+
                 const code = searchParams.get('access_token');
                 const refreshToken = searchParams.get('refresh_token');
 
@@ -122,5 +128,20 @@ export default function AuthCallback() {
                 </div>
             </Card>
         </div>
+    );
+}
+
+export default function AuthCallback() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+                <div className="text-center text-white">
+                    <Loader className="h-8 w-8 animate-spin mx-auto mb-4" />
+                    <p>Loading...</p>
+                </div>
+            </div>
+        }>
+            <AuthCallbackContent />
+        </Suspense>
     );
 }

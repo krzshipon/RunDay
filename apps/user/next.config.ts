@@ -7,10 +7,12 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: 'standalone',
+  transpilePackages: ['@runday/ui', '@runday/dashboard', '@runday/database', '@runday/auth'],
+  // Disable static optimization to prevent SSR context issues
   experimental: {
-    esmExternals: false
-  }
+    // Disable static optimization
+    workerThreads: false,
+  },
 };
 
 export default nextConfig;
