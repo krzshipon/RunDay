@@ -123,7 +123,7 @@ export function RegistrationStatus({
                     {!canCancelRegistration && (
                         <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
                             <AlertTriangle className="w-3 h-3" />
-                            Can't cancel within 24 hours
+                            Can&apos;t cancel within 24 hours
                         </div>
                     )}
                 </div>

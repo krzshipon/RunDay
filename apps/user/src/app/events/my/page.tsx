@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ResultsCard } from '@/components/ResultsCard';
-import { RegistrationStatus } from '@/components/RegistrationStatus';
-import { Card, Button } from '@runday/ui';
+import { CertificateGenerator } from '@/components/CertificateGenerator';
+import { Button } from '@runday/ui';
 import {
     Calendar,
     MapPin,
@@ -13,9 +13,7 @@ import {
     Clock,
     Trophy,
     RefreshCw,
-    CheckCircle,
-    AlertTriangle,
-    Download
+    AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import {
@@ -316,13 +314,7 @@ export default function MyEventsPage() {
                                                 )}
 
                                                 {activeTab === 'completed' && registration.finish_time && (
-                                                    <Button
-                                                        size="sm"
-                                                        className="bg-gradient-to-r from-[#FF9F1C] to-amber-500 hover:from-amber-600 hover:to-amber-700 text-white border-0"
-                                                    >
-                                                        <Download className="h-3 w-3 mr-1" />
-                                                        Certificate
-                                                    </Button>
+                                                    <CertificateGenerator registration={registration} />
                                                 )}
                                             </div>
                                         </div>
@@ -336,7 +328,7 @@ export default function MyEventsPage() {
                                         <>
                                             <Calendar className="h-16 w-16 text-slate-600 mx-auto mb-4" />
                                             <h3 className="text-lg font-medium text-white mb-2">No upcoming events</h3>
-                                            <p className="text-slate-400 mb-4">You haven't registered for any upcoming events yet.</p>
+                                            <p className="text-slate-400 mb-4">You haven&apos;t registered for any upcoming events yet.</p>
                                             <Button
                                                 onClick={() => window.location.href = '/events'}
                                                 className="bg-gradient-to-r from-[#FF9F1C] to-amber-500 hover:from-amber-600 hover:to-amber-700 text-white border-0"
@@ -348,7 +340,7 @@ export default function MyEventsPage() {
                                         <>
                                             <Trophy className="h-16 w-16 text-slate-600 mx-auto mb-4" />
                                             <h3 className="text-lg font-medium text-white mb-2">No completed events</h3>
-                                            <p className="text-slate-400">You haven't completed any events yet. Register for events to start building your running history!</p>
+                                            <p className="text-slate-400">You haven&apos;t completed any events yet. Register for events to start building your running history!</p>
                                         </>
                                     )}
                                 </div>

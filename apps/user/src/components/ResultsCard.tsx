@@ -3,6 +3,7 @@
 import { Card, Badge } from '@runday/ui';
 import { Clock, Trophy, MapPin, Calendar, Users, Target, Timer } from 'lucide-react';
 import { EventRegistrationData } from '@/lib/event-operations';
+import { CertificateGenerator } from './CertificateGenerator';
 
 interface ResultsCardProps {
     registration: EventRegistrationData;
@@ -178,6 +179,13 @@ export function ResultsCard({
                                     {performance.icon}
                                     {performance.label}
                                 </Badge>
+                            </div>
+                        )}
+
+                        {/* Certificate Download */}
+                        {hasResults && (
+                            <div className="flex justify-center mt-4">
+                                <CertificateGenerator registration={registration} />
                             </div>
                         )}
                     </div>
