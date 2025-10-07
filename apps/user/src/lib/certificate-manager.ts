@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { EventRegistrationData } from '@/lib/event-operations';
 
@@ -61,6 +61,10 @@ class CertificateManager {
                 .limit(1);
 
             if (error) {
+                // Handle case where certificates table doesn't exist yet
+                if (error.message?.includes('relation "public.certificates" does not exist')) {
+                    return null; // No certificates exist yet
+                }
                 console.error('Error fetching certificate record:', error);
                 return null;
             }
@@ -186,11 +190,16 @@ class CertificateManager {
                 .order('generated_at', { ascending: false });
 
             if (error) {
+                // Handle case where certificates table doesn't exist yet
+                if (error.message?.includes('relation "public.certificates" does not exist')) {
+                    console.info('Certificates table not yet created - returning empty array');
+                    return { success: true, certificates: [] };
+                }
                 console.error('Error fetching user certificates:', error);
                 return { success: false, error: error.message };
             }
 
-            return { success: true, certificates: data };
+            return { success: true, certificates: data || [] };
         } catch (error) {
             console.error('Error getting user certificates:', error);
             return { success: false, error: 'Failed to get certificates' };
@@ -261,19 +270,23 @@ export function useCertificateManager() {
     const [certificates, setCertificates] = useState<CertificateRecord[]>([]);
     const [loading, setLoading] = useState(false);
 
-    const loadUserCertificates = async (userId: string) => {
+    const loadUserCertificates = useCallback(async (userId: string) => {
         setLoading(true);
         try {
             const result = await manager.getUserCertificates(userId);
             if (result.success && result.certificates) {
                 setCertificates(result.certificates);
+            } else if (result.error) {
+                console.error('Failed to load certificates:', result.error);
+                setCertificates([]); // Set empty array on error
             }
         } catch (error) {
             console.error('Error loading certificates:', error);
+            setCertificates([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [manager]);
 
     const storeCertificate = async (blob: Blob, registration: EventRegistrationData, userId: string) => {
         return await manager.storeCertificate(blob, registration, userId);

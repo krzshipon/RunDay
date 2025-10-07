@@ -2,7 +2,7 @@
 
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
-import { CertificateHistory } from '@/components/CertificateHistory';
+import CertificateHistory from '@/components/CertificateHistory';
 
 export default function CertificatesPage() {
     return (

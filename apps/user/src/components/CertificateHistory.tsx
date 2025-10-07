@@ -6,202 +6,149 @@ import { Download, Trash2, FileText, Trophy, Calendar, MapPin, Clock, RefreshCw 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useCertificateManager, CertificateRecord } from '@/lib/certificate-manager';
 
-export function CertificateHistory() {
+export default function CertificateHistory() {
     const { user } = useAuth();
     const { certificates, loading, loadUserCertificates, getDownloadUrl, deleteCertificate } = useCertificateManager();
-    const [downloadingId, setDownloadingId] = useState<string | null>(null);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (user?.id) {
-            loadUserCertificates(user.id);
+        if (user) {
+            loadUserCertificates(user.id).catch(err => {
+                setError('Failed to load certificates');
+                console.error('Load certificates error:', err);
+            });
         }
-    }, [user?.id, loadUserCertificates]);
+    }, [user, loadUserCertificates]);
 
     const handleDownload = async (certificate: CertificateRecord) => {
-        setDownloadingId(certificate.id);
         try {
             const result = await getDownloadUrl(certificate.file_path);
             if (result.success && result.url) {
-                // Create a temporary link to download the file
-                const link = document.createElement('a');
-                link.href = result.url;
-                link.download = `RunDay_Certificate_${(certificate as any).registrations?.events?.name?.replace(/[^a-zA-Z0-9]/g, '_') || 'Event'}.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                window.open(result.url, '_blank');
             } else {
-                console.error('Failed to get download URL:', result.error);
+                setError(result.error || 'Failed to get download URL');
             }
-        } catch (error) {
-            console.error('Error downloading certificate:', error);
-        } finally {
-            setDownloadingId(null);
+        } catch (err) {
+            setError('Failed to download certificate');
+            console.error('Download failed:', err);
         }
     };
 
-    const handleDelete = async (certificate: CertificateRecord) => {
-        if (!user?.id) return;
-
-        const confirmed = window.confirm('Are you sure you want to delete this certificate? This action cannot be undone.');
-        if (!confirmed) return;
-
-        setDeletingId(certificate.id);
-        try {
-            const result = await deleteCertificate(certificate.id, user.id);
-            if (!result.success) {
-                console.error('Failed to delete certificate:', result.error);
+    const handleDelete = async (certificateId: string) => {
+        if (window.confirm('Are you sure you want to delete this certificate?')) {
+            try {
+                await deleteCertificate(certificateId, user!.id);
+            } catch (err) {
+                setError('Failed to delete certificate');
+                console.error('Delete failed:', err);
             }
-        } catch (error) {
-            console.error('Error deleting certificate:', error);
-        } finally {
-            setDeletingId(null);
         }
     };
 
-    const formatFileSize = (bytes: number): string => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-    };
-
-    const formatDate = (dateString: string): string => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
-    if (loading) {
+    if (!user) {
         return (
-            <Card className="p-6">
-                <div className="flex items-center justify-center py-8">
-                    <RefreshCw className="h-6 w-6 animate-spin text-gray-500" />
-                    <span className="ml-2 text-gray-600">Loading certificates...</span>
+            <div className="container mx-auto px-4 py-8">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Please log in to view your certificates</h1>
                 </div>
-            </Card>
-        );
-    }
-
-    if (certificates.length === 0) {
-        return (
-            <Card className="p-6">
-                <div className="text-center py-8">
-                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Certificates Yet</h3>
-                    <p className="text-gray-500">Complete some events and download your certificates to see them here.</p>
-                </div>
-            </Card>
+            </div>
         );
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">Certificate History</h2>
-                <Button
-                    onClick={() => user?.id && loadUserCertificates(user.id)}
-                    variant="ghost"
-                    size="sm"
-                    disabled={loading}
-                >
-                    <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
-                    Refresh
-                </Button>
-            </div>
+        <div className="container mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Certificate Portfolio</h1>
+                    <p className="text-gray-600">Manage and download your race certificates</p>
+                </div>
 
-            <div className="grid gap-4">
-                {certificates.map((certificate) => {
-                    const event = (certificate as any).registrations?.events;
-                    const registration = (certificate as any).registrations;
-                    const eventDate = event?.event_date ? new Date(event.event_date) : null;
+                {loading ? (
+                    <div className="flex justify-center items-center py-12">
+                        <RefreshCw className="w-6 h-6 animate-spin text-blue-500" />
+                        <span className="ml-2 text-gray-600">Loading certificates...</span>
+                    </div>
+                ) : error ? (
+                    <Card className="p-6 text-center bg-red-50 border-red-200">
+                        <p className="text-red-600 mb-4">{error}</p>
+                        <Button onClick={() => user && loadUserCertificates(user.id)} variant="secondary">
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Retry
+                        </Button>
+                    </Card>
+                ) : certificates.length === 0 ? (
+                    <Card className="p-8 text-center">
+                        <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No certificates yet</h3>
+                        <p className="text-gray-600 mb-6">Create your first certificate to get started</p>
+                        <Button onClick={() => window.location.href = '/certificates/generator'}>
+                            <Trophy className="w-4 h-4 mr-2" />
+                            Create Certificate
+                        </Button>
+                    </Card>
+                ) : (
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-semibold text-gray-900">
+                                Your Certificates ({certificates.length})
+                            </h2>
+                            <Button onClick={() => window.location.href = '/certificates/generator'} variant="secondary">
+                                <Trophy className="w-4 h-4 mr-2" />
+                                Create New
+                            </Button>
+                        </div>
 
-                    return (
-                        <Card key={certificate.id} className="p-4">
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Trophy className="h-4 w-4 text-amber-500" />
-                                        <h3 className="font-semibold text-gray-900">
-                                            {event?.name || 'Event Certificate'}
-                                        </h3>
-                                        {certificate.regenerated_count > 0 && (
-                                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                                Regenerated {certificate.regenerated_count}x
-                                            </span>
-                                        )}
-                                    </div>
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {certificates.map((certificate) => (
+                                <Card key={certificate.id} className="p-4 hover:shadow-md transition-shadow">
+                                    <div className="space-y-3">
+                                        <div className="flex items-start justify-between">
+                                            <h3 className="font-semibold text-gray-900 truncate">
+                                                Certificate #{certificate.id.slice(-8)}
+                                            </h3>
+                                            <Trophy className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
-                                        {eventDate && (
-                                            <div className="flex items-center gap-1">
-                                                <Calendar className="h-3 w-3" />
-                                                <span>Event: {eventDate.toLocaleDateString()}</span>
+                                        <div className="space-y-2 text-sm text-gray-600">
+                                            <div className="flex items-center">
+                                                <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+                                                <span>{new Date(certificate.generated_at).toLocaleDateString()}</span>
                                             </div>
-                                        )}
-                                        {event?.distance && (
-                                            <div className="flex items-center gap-1">
-                                                <Clock className="h-3 w-3" />
-                                                <span>Distance: {event.distance}</span>
+                                            <div className="flex items-center">
+                                                <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
+                                                <span className="truncate">Event ID: {certificate.event_id}</span>
                                             </div>
-                                        )}
-                                        {event?.location && (
-                                            <div className="flex items-center gap-1">
-                                                <MapPin className="h-3 w-3" />
-                                                <span>Location: {event.location}</span>
-                                            </div>
-                                        )}
+                                            {certificate.regenerated_count > 0 && (
+                                                <div className="flex items-center">
+                                                    <RefreshCw className="w-4 h-4 mr-2 flex-shrink-0" />
+                                                    <span>Regenerated {certificate.regenerated_count} times</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex space-x-2">
+                                            <Button
+                                                onClick={() => handleDownload(certificate)}
+                                                size="sm"
+                                                className="flex-1"
+                                            >
+                                                <Download className="w-4 h-4 mr-1" />
+                                                Download
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleDelete(certificate.id)}
+                                                variant="danger"
+                                                size="sm"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
                                     </div>
-
-                                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                                        <span>Generated: {formatDate(certificate.generated_at)}</span>
-                                        <span>Size: {formatFileSize(certificate.file_size)}</span>
-                                        {registration?.position && (
-                                            <span>Position: #{registration.position}</span>
-                                        )}
-                                        {registration?.finish_time && (
-                                            <span>Time: {registration.finish_time}</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-2 ml-4">
-                                    <Button
-                                        onClick={() => handleDownload(certificate)}
-                                        disabled={downloadingId === certificate.id}
-                                        size="sm"
-                                        className="bg-gradient-to-r from-[#FF9F1C] to-amber-500 hover:from-amber-600 hover:to-amber-700 text-white border-0"
-                                    >
-                                        {downloadingId === certificate.id ? (
-                                            <RefreshCw className="h-3 w-3 animate-spin" />
-                                        ) : (
-                                            <Download className="h-3 w-3" />
-                                        )}
-                                    </Button>
-
-                                    <Button
-                                        onClick={() => handleDelete(certificate)}
-                                        disabled={deletingId === certificate.id}
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                    >
-                                        {deletingId === certificate.id ? (
-                                            <RefreshCw className="h-3 w-3 animate-spin" />
-                                        ) : (
-                                            <Trash2 className="h-3 w-3" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                        </Card>
-                    );
-                })}
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

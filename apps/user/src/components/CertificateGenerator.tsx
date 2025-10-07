@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Button } from '@runday/ui';
-import { Download, FileText, Trophy, Medal, Award, RefreshCw } from 'lucide-react';
+import { Download, FileText, Trophy, Medal, Award, RefreshCw, X } from 'lucide-react';
 import { EventRegistrationData } from '@/lib/event-operations';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { CertificatePreview } from './CertificatePreview';
@@ -21,6 +21,8 @@ export function CertificateGenerator({
 }: CertificateGeneratorProps) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [hasExistingCertificate, setHasExistingCertificate] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const certificateRef = useRef<HTMLDivElement>(null);
     const { user } = useAuth();
     const { storeCertificate, getCertificateRecord, getDownloadUrl } = useCertificateManager(); const event = registration.event;
@@ -56,21 +58,28 @@ export function CertificateGenerator({
     const performanceLevel = getPerformanceLevel();
     const eventDate = new Date(event.event_date);
 
-    // Check for existing certificate on component mount
+    // Check for existing certificate
     useEffect(() => {
         const checkExistingCertificate = async () => {
-            if (user?.id) {
-                const record = await getCertificateRecord(registration.id, user.id);
-                setHasExistingCertificate(!!record);
+            if (user && registration.id) {
+                try {
+                    const existing = await getCertificateRecord(registration.id, user.id);
+                    setHasExistingCertificate(!!existing);
+                } catch (error) {
+                    console.warn('Could not check existing certificate:', error);
+                    setHasExistingCertificate(false);
+                }
             }
         };
+
         checkExistingCertificate();
-    }, [registration.id, user?.id, getCertificateRecord]);
+    }, [user, registration.id, getCertificateRecord]);
 
     const generateCertificate = async () => {
         if (!certificateRef.current) return;
 
         setIsGenerating(true);
+        setError(null);
 
         try {
             // Create canvas from the certificate component
@@ -95,29 +104,34 @@ export function CertificateGenerator({
 
             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
 
-            // Generate PDF blob for storage
+            // Convert PDF to blob for storage
             const pdfBlob = pdf.output('blob');
 
-            // Store certificate in Supabase if user is logged in
-            if (user?.id) {
-                const storeResult = await storeCertificate(pdfBlob, registration, user.id);
-                if (storeResult.success) {
-                    setHasExistingCertificate(true);
+            // Create a temporary URL for the PDF blob
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+
+            // Set the preview URL (this will trigger the modal)
+            setPreviewUrl(pdfUrl);
+
+            // Store the certificate in Supabase if user is logged in
+            if (user) {
+                try {
+                    await storeCertificate(pdfBlob, registration, user.id);
                     console.log('Certificate stored successfully');
-                } else {
-                    console.error('Failed to store certificate:', storeResult.error);
+                } catch (storageError) {
+                    console.warn('Failed to store certificate:', storageError);
+                    // Don't fail the generation if storage fails
                 }
             }
 
-            // Generate filename for download
+            // Also download the PDF
             const eventName = event.name.replace(/[^a-zA-Z0-9]/g, '_');
             const filename = `RunDay_Certificate_${eventName}_${user?.email || 'user'}.pdf`;
-
-            // Download the PDF
             pdf.save(filename);
-        } catch (error) {
+
+        } catch (error: any) {
             console.error('Error generating certificate:', error);
-            // You could add toast notification here
+            setError(error.message || 'Failed to generate certificate');
         } finally {
             setIsGenerating(false);
         }
@@ -314,6 +328,49 @@ export function CertificateGenerator({
                     </div>
                 </div>
             </div>
+
+            {/* PDF Preview Modal */}
+            {previewUrl && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col">
+                        <div className="flex justify-between items-center p-4 border-b">
+                            <h3 className="text-lg font-semibold">Certificate Preview</h3>
+                            <Button
+                                onClick={() => {
+                                    setPreviewUrl(null);
+                                    URL.revokeObjectURL(previewUrl);
+                                }}
+                                variant="ghost"
+                                size="sm"
+                            >
+                                <X className="w-4 h-4" />
+                            </Button>
+                        </div>
+                        <div className="flex-1 p-4">
+                            <iframe
+                                src={previewUrl}
+                                className="w-full h-full border-0"
+                                title="Certificate Preview"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Error Display */}
+            {error && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-red-600 text-sm">{error}</p>
+                    <Button
+                        onClick={() => setError(null)}
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2"
+                    >
+                        Dismiss
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }
