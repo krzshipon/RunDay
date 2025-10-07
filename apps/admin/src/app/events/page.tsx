@@ -67,8 +67,7 @@ export default function EventsPage() {
     };
 
     const handleViewEvent = (eventId: string) => {
-        console.log('View event:', eventId);
-        // TODO: Navigate to event details page
+        window.location.href = `/events/${eventId}`;
     };
 
     const handleDeleteEvent = async (eventId: string) => {
@@ -247,14 +246,14 @@ export default function EventsPage() {
                                                 className="px-6 pb-2"
                                             />
 
-                                            {/* Participants Management Button */}
+                                            {/* Event Details Button */}
                                             <div className="px-6 pb-4">
                                                 <Link
-                                                    href={`/events/${event.id}/participants`}
+                                                    href={`/events/${event.id}`}
                                                     className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[#2B2D42] hover:bg-[#2B2D42]/90 text-white rounded-lg transition-colors text-sm"
                                                 >
                                                     <Users className="h-4 w-4" />
-                                                    Manage Participants ({event.registeredCount || 0})
+                                                    View Details & Participants ({event.registeredCount || 0})
                                                 </Link>
                                             </div>
                                         </div>
