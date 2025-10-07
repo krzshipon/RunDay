@@ -111,14 +111,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const handleVisibilityChange = () => {
             const wasVisible = isTabVisibleRef.current;
             isTabVisibleRef.current = !document.hidden;
-            
+
             console.log('Tab visibility changed:', isTabVisibleRef.current ? 'visible' : 'hidden');
 
             if (isTabVisibleRef.current && !wasVisible) {
                 // Tab became visible - activate prevention for a short period
                 console.log('Tab became visible, activating update prevention');
                 preventTabSwitchUpdatesRef.current = true;
-                
+
                 // Disable prevention after 3 seconds to allow genuine updates
                 setTimeout(() => {
                     preventTabSwitchUpdatesRef.current = false;
@@ -181,10 +181,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
                 // Save state for persistence
                 if (session?.user) {
-                    saveAuthState({ 
-                        user: session.user, 
-                        isVerified: session.user.email_confirmed_at ? true : false, 
-                        lastCheck: now 
+                    saveAuthState({
+                        user: session.user,
+                        isVerified: session.user.email_confirmed_at ? true : false,
+                        lastCheck: now
                     });
                 } else {
                     clearAuthState();

@@ -125,12 +125,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
             const isUserAdmin = profile?.role === 'admin';
             console.log('Is admin:', isUserAdmin);
             setIsAdmin(isUserAdmin);
-            
+
             // Save to cache
             const now = Date.now();
             lastAuthCheckRef.current = now;
             saveAuthState({ user, isAdmin: isUserAdmin, lastCheck: now });
-            
+
             return isUserAdmin;
         } catch (error) {
             console.error('Error checking admin status:', error);
@@ -147,7 +147,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             try {
                 // First, try to load from cache
                 const savedState = loadAuthState();
-                
+
                 const { data: { session }, error } = await supabase.auth.getSession();
 
                 if (error) {
@@ -199,14 +199,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const handleVisibilityChange = () => {
             const wasVisible = isTabVisibleRef.current;
             isTabVisibleRef.current = !document.hidden;
-            
+
             console.log('Tab visibility changed:', isTabVisibleRef.current ? 'visible' : 'hidden');
 
             if (isTabVisibleRef.current && !wasVisible) {
                 // Tab became visible - activate prevention for a short period
                 console.log('Tab became visible, activating update prevention');
                 preventTabSwitchUpdatesRef.current = true;
-                
+
                 // Disable prevention after 3 seconds to allow genuine updates
                 setTimeout(() => {
                     preventTabSwitchUpdatesRef.current = false;
@@ -268,7 +268,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 if (session?.user) {
                     // Only check admin status for significant changes
                     const forceCheck = shouldShowLoading;
-                    
+
                     if (forceCheck) {
                         lastAuthCheckRef.current = now;
                         await checkAdminStatus(session.user, forceCheck);

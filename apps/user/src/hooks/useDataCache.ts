@@ -27,7 +27,7 @@ class DataCache {
     get<T>(key: string): CacheEntry<T> | null {
         // First check memory cache
         let entry = this.cache.get(key);
-        
+
         // If not in memory, try localStorage
         if (!entry) {
             try {
@@ -77,7 +77,7 @@ class DataCache {
     isFresh(key: string, staleTime: number): boolean {
         const entry = this.get(key);
         if (!entry) return false;
-        
+
         return Date.now() - entry.timestamp < staleTime;
     }
 
@@ -91,7 +91,7 @@ class DataCache {
         if (!this.subscribers.has(key)) {
             this.subscribers.set(key, new Set());
         }
-        
+
         this.subscribers.get(key)!.add(callback);
 
         // Return unsubscribe function
@@ -198,9 +198,9 @@ export function useDataCache<T>(
         try {
             setLoading(true);
             console.log(`[DataCache] Fetching fresh data for ${key}`);
-            
+
             const freshData = await fetcher();
-            
+
             if (isMountedRef.current) {
                 setData(freshData);
                 setError(null);
@@ -210,7 +210,7 @@ export function useDataCache<T>(
         } catch (err) {
             const error = err instanceof Error ? err : new Error('Failed to fetch data');
             console.error(`[DataCache] Error fetching data for ${key}:`, error);
-            
+
             if (isMountedRef.current) {
                 setError(error);
                 // If we have cached data, keep showing it despite the error
@@ -233,7 +233,7 @@ export function useDataCache<T>(
             console.log(`[DataCache] Initial load from cache for ${key}`);
             setData(cachedEntry.data);
             setLoading(false);
-            
+
             // If cache is stale, refresh in background
             if (!globalCache.isFresh(key, staleTime)) {
                 console.log(`[DataCache] Cache stale for ${key}, refreshing in background`);
