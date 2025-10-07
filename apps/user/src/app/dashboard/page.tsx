@@ -6,7 +6,7 @@ import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, Button } from '@runday/ui';
 import { Calendar, MapPin, Trophy, Users, Activity, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { 
+import {
     getUserEventStats,
     getUserRegisteredEvents,
     getPublicEvents,
@@ -68,8 +68,8 @@ export default function DashboardPage() {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
             day: 'numeric',
             year: 'numeric'
         });
@@ -78,7 +78,7 @@ export default function DashboardPage() {
     const getEventStatus = (event: any) => {
         const eventDate = new Date(event.event_date);
         const now = new Date();
-        
+
         if (event.status === 'completed' || eventDate < now) {
             return 'completed';
         } else if (event.status === 'cancelled') {
@@ -165,7 +165,7 @@ export default function DashboardPage() {
                                 View All
                             </Button>
                         </div>
-                        
+
                         {isLoading ? (
                             <div className="space-y-3">
                                 {[1, 2].map((i) => (

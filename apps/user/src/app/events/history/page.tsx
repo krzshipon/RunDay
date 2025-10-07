@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, Button, Input } from '@runday/ui';
-import { 
-    Calendar, 
-    MapPin, 
+import {
+    Calendar,
+    MapPin,
     Clock,
     Trophy,
     Search,
@@ -17,7 +17,7 @@ import {
     TrendingUp
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { 
+import {
     getUserRegisteredEvents,
     EventRegistrationData
 } from '@/lib/event-operations';
@@ -106,9 +106,9 @@ export default function EventHistoryPage() {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
+        return date.toLocaleDateString('en-US', {
             year: 'numeric',
-            month: 'long', 
+            month: 'long',
             day: 'numeric'
         });
     };
@@ -121,7 +121,7 @@ export default function EventHistoryPage() {
     const getEventStatus = (event: any) => {
         const eventDate = new Date(event.event_date);
         const now = new Date();
-        
+
         if (event.status === 'completed' || eventDate < now) {
             return 'completed';
         } else if (event.status === 'cancelled') {
@@ -132,14 +132,14 @@ export default function EventHistoryPage() {
     };
 
     const getUniqueYears = () => {
-        const years = allRegistrations.map(reg => 
+        const years = allRegistrations.map(reg =>
             new Date(reg.event?.event_date || '').getFullYear().toString()
         );
         return [...new Set(years)].sort().reverse();
     };
 
     const getStatistics = () => {
-        const completedEvents = filteredRegistrations.filter(reg => 
+        const completedEvents = filteredRegistrations.filter(reg =>
             getEventStatus(reg.event) === 'completed' && reg.finish_time
         );
 
@@ -171,7 +171,7 @@ export default function EventHistoryPage() {
                                 <p className="mt-2 text-slate-300">Your complete running event history</p>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-center py-12">
                             <div className="text-center">
                                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#FF9F1C] border-t-transparent mx-auto mb-4"></div>
@@ -213,7 +213,7 @@ export default function EventHistoryPage() {
                             </div>
                             <p className="text-2xl font-bold text-white">{stats.totalEvents}</p>
                         </div>
-                        
+
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Trophy className="h-4 w-4 text-emerald-400" />
@@ -221,7 +221,7 @@ export default function EventHistoryPage() {
                             </div>
                             <p className="text-2xl font-bold text-white">{stats.completedEvents}</p>
                         </div>
-                        
+
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <TrendingUp className="h-4 w-4 text-purple-400" />
@@ -229,7 +229,7 @@ export default function EventHistoryPage() {
                             </div>
                             <p className="text-2xl font-bold text-white">{stats.totalDistance}</p>
                         </div>
-                        
+
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Clock className="h-4 w-4 text-amber-400" />
@@ -326,7 +326,7 @@ export default function EventHistoryPage() {
                                                         <p className="text-sm font-medium">{formatDate(registration.event?.event_date || '')}</p>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex items-center gap-2 text-slate-300">
                                                     <MapPin className="h-4 w-4" />
                                                     <div>
@@ -334,7 +334,7 @@ export default function EventHistoryPage() {
                                                         <p className="text-sm font-medium">{registration.event?.location || 'TBA'}</p>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex items-center gap-2 text-slate-300">
                                                     <Clock className="h-4 w-4" />
                                                     <div>
@@ -395,8 +395,8 @@ export default function EventHistoryPage() {
                                 <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-8">
                                     <BarChart3 className="h-16 w-16 text-slate-600 mx-auto mb-4" />
                                     <h3 className="text-lg font-medium text-white mb-2">
-                                        {searchQuery || selectedYear !== 'all' 
-                                            ? 'No events match your filters' 
+                                        {searchQuery || selectedYear !== 'all'
+                                            ? 'No events match your filters'
                                             : 'No event history yet'
                                         }
                                     </h3>

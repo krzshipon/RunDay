@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, Button, Input } from '@runday/ui';
-import { 
-    Calendar, 
-    MapPin, 
-    Users, 
+import {
+    Calendar,
+    MapPin,
+    Users,
     Clock,
     Search,
     Filter,
@@ -17,7 +17,7 @@ import {
     AlertCircle
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { 
+import {
     getPublicEvents,
     registerForEvent,
     cancelRegistration,
@@ -79,15 +79,15 @@ export default function EventsPage() {
 
         // Distance filter
         if (selectedDistance !== 'all') {
-            filtered = filtered.filter(event => 
+            filtered = filtered.filter(event =>
                 event.distance.toLowerCase().includes(selectedDistance.toLowerCase())
             );
         }
 
         // Availability filter
         if (showOnlyAvailable) {
-            filtered = filtered.filter(event => 
-                !event.max_participants || 
+            filtered = filtered.filter(event =>
+                !event.max_participants ||
                 (event.registeredCount || 0) < event.max_participants
             );
         }
@@ -143,11 +143,11 @@ export default function EventsPage() {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
+        return date.toLocaleDateString('en-US', {
             weekday: 'long',
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
     };
 
@@ -155,10 +155,10 @@ export default function EventsPage() {
         if (!event.max_participants) {
             return { text: 'Unlimited spots', color: 'text-emerald-400', available: true };
         }
-        
+
         const registered = event.registeredCount || 0;
         const remaining = event.max_participants - registered;
-        
+
         if (remaining <= 0) {
             return { text: 'Event Full', color: 'text-red-400', available: false };
         } else if (remaining <= 5) {
@@ -184,7 +184,7 @@ export default function EventsPage() {
                                 <p className="mt-2 text-slate-300">Discover and register for running events</p>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-center py-12">
                             <div className="text-center">
                                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#FF9F1C] border-t-transparent mx-auto mb-4"></div>
@@ -273,7 +273,7 @@ export default function EventsPage() {
                         {filteredEvents.length > 0 ? (
                             filteredEvents.map((event) => {
                                 const availabilityInfo = getAvailabilityInfo(event);
-                                
+
                                 return (
                                     <div key={event.id} className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl overflow-hidden hover:bg-slate-800/70 transition-all duration-200">
                                         <div className="p-6">
@@ -291,17 +291,17 @@ export default function EventsPage() {
                                                     <Calendar className="h-4 w-4" />
                                                     <span className="text-sm">{formatDate(event.event_date)}</span>
                                                 </div>
-                                                
+
                                                 <div className="flex items-center gap-2 text-slate-300">
                                                     <MapPin className="h-4 w-4" />
                                                     <span className="text-sm">{event.location || 'Location TBA'}</span>
                                                 </div>
-                                                
+
                                                 <div className="flex items-center gap-2 text-slate-300">
                                                     <Clock className="h-4 w-4" />
                                                     <span className="text-sm">{event.distance}</span>
                                                 </div>
-                                                
+
                                                 <div className="flex items-center gap-2">
                                                     <Users className="h-4 w-4 text-slate-400" />
                                                     <span className={`text-sm ${availabilityInfo.color}`}>
@@ -327,7 +327,7 @@ export default function EventsPage() {
                                                 ) : (
                                                     <div></div>
                                                 )}
-                                                
+
                                                 {event.isUserRegistered ? (
                                                     <Button
                                                         size="sm"
@@ -357,8 +357,8 @@ export default function EventsPage() {
                             <div className="col-span-full text-center py-12">
                                 <Calendar className="h-16 w-16 text-slate-600 mx-auto mb-4" />
                                 <h3 className="text-lg font-medium text-white mb-2">
-                                    {searchQuery || selectedDistance !== 'all' || showOnlyAvailable 
-                                        ? 'No events match your filters' 
+                                    {searchQuery || selectedDistance !== 'all' || showOnlyAvailable
+                                        ? 'No events match your filters'
                                         : 'No events available'
                                     }
                                 </h3>

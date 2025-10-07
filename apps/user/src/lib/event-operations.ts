@@ -330,7 +330,7 @@ export async function getUserEventStats(userId: string): Promise<{
 
         registrations?.forEach((reg: any) => {
             const eventDate = new Date(reg.events.event_date);
-            
+
             if (reg.events.status === 'completed' || eventDate < now) {
                 completedCount++;
                 if (reg.finish_time) {

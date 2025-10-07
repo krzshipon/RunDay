@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, Button } from '@runday/ui';
-import { 
-    Calendar, 
-    MapPin, 
-    Users, 
+import {
+    Calendar,
+    MapPin,
+    Users,
     Clock,
     Trophy,
     RefreshCw,
@@ -16,7 +16,7 @@ import {
     Download
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { 
+import {
     getUserRegisteredEvents,
     cancelRegistration,
     EventRegistrationData
@@ -81,11 +81,11 @@ export default function MyEventsPage() {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
+        return date.toLocaleDateString('en-US', {
             weekday: 'long',
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
     };
 
@@ -101,7 +101,7 @@ export default function MyEventsPage() {
     const getEventStatus = (event: any) => {
         const eventDate = new Date(event.event_date);
         const now = new Date();
-        
+
         if (event.status === 'completed' || eventDate < now) {
             return 'completed';
         } else if (event.status === 'cancelled') {
@@ -130,7 +130,7 @@ export default function MyEventsPage() {
                                 <p className="mt-2 text-slate-300">Manage your event registrations</p>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-center py-12">
                             <div className="text-center">
                                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#FF9F1C] border-t-transparent mx-auto mb-4"></div>
@@ -179,21 +179,19 @@ export default function MyEventsPage() {
                         <nav className="flex space-x-8">
                             <button
                                 onClick={() => setActiveTab('upcoming')}
-                                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                                    activeTab === 'upcoming'
+                                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'upcoming'
                                         ? 'border-[#FF9F1C] text-[#FF9F1C]'
                                         : 'border-transparent text-slate-400 hover:text-white hover:border-slate-600'
-                                }`}
+                                    }`}
                             >
                                 Upcoming Events ({upcomingCount})
                             </button>
                             <button
                                 onClick={() => setActiveTab('completed')}
-                                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                                    activeTab === 'completed'
+                                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'completed'
                                         ? 'border-[#FF9F1C] text-[#FF9F1C]'
                                         : 'border-transparent text-slate-400 hover:text-white hover:border-slate-600'
-                                }`}
+                                    }`}
                             >
                                 Completed Events ({completedCount})
                             </button>
@@ -227,7 +225,7 @@ export default function MyEventsPage() {
                                                         <p className="text-sm font-medium">{formatDate(registration.event?.event_date || '')}</p>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex items-center gap-2 text-slate-300">
                                                     <MapPin className="h-4 w-4" />
                                                     <div>
@@ -235,7 +233,7 @@ export default function MyEventsPage() {
                                                         <p className="text-sm font-medium">{registration.event?.location || 'TBA'}</p>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex items-center gap-2 text-slate-300">
                                                     <Clock className="h-4 w-4" />
                                                     <div>
@@ -298,7 +296,7 @@ export default function MyEventsPage() {
                                                     {isUpdating === registration.event_id ? 'Cancelling...' : 'Cancel Registration'}
                                                 </Button>
                                             )}
-                                            
+
                                             {activeTab === 'completed' && registration.finish_time && (
                                                 <Button
                                                     size="sm"
