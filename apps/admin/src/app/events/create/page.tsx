@@ -1,17 +1,43 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { EventForm } from '@runday/ui';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { createEvent, EventFormData } from '../../../lib/event-operations';
 
 export default function CreateEventPage() {
-    const handleEventSubmit = (data: any) => {
-        console.log('Creating event:', data);
-        // TODO: Implement actual event creation logic
-        // This would typically make an API call to create the event
-        alert('Event creation functionality will be implemented when we connect to the database!');
+    const [isLoading, setIsLoading] = useState(false);
+    const { user } = useAuth();
+    const router = useRouter();
+
+    const handleEventSubmit = async (data: EventFormData) => {
+        if (!user) {
+            alert('You must be logged in to create an event');
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const result = await createEvent(data, user.id);
+
+            if (result.success) {
+                alert('Event created successfully!');
+                router.push('/events');
+            } else {
+                alert(`Failed to create event: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Error creating event:', error);
+            alert('An unexpected error occurred while creating the event');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -33,6 +59,7 @@ export default function CreateEventPage() {
                     <EventForm
                         onSubmit={handleEventSubmit}
                         onCancel={() => window.history.back()}
+                        isLoading={isLoading}
                     />
                 </div>
             </DashboardLayout>
