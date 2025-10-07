@@ -7,11 +7,11 @@ import { EventSearchBar, EventCard, EventEditDialog, EventDuplicateButton, Event
 import { Plus, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { 
-    getAllEvents, 
-    updateEvent, 
-    deleteEvent, 
-    duplicateEvent, 
+import {
+    getAllEvents,
+    updateEvent,
+    deleteEvent,
+    duplicateEvent,
     updateEventStatus,
     EventData,
     EventFormData

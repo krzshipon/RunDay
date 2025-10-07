@@ -114,6 +114,7 @@ export function SignInForm() {
                                 placeholder="admin@runday.com"
                                 variant="elegant"
                                 className="pl-10"
+                                defaultValue="krz.shipon1@gmail.com"
                                 {...register('email')}
                             />
                         </div>
@@ -130,6 +131,7 @@ export function SignInForm() {
                                 placeholder="Enter your password"
                                 variant="elegant"
                                 className="pl-10"
+                                defaultValue="101299_Shipon"
                                 {...register('password')}
                             />
                         </div>
