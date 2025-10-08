@@ -43,10 +43,10 @@ export const adminNavigation: NavigationItem[] = [
         ],
     },
     {
-        id: 'reports',
-        label: 'Reports',
-        href: '/reports',
-        icon: FileText,
+        id: 'profile',
+        label: 'Profile',
+        href: '/profile',
+        icon: User,
     },
     {
         id: 'settings',
@@ -95,18 +95,6 @@ export const userNavigation: NavigationItem[] = [
         label: 'Certificates',
         href: '/certificates',
         icon: Award,
-    },
-    {
-        id: 'achievements',
-        label: 'Achievements',
-        href: '/achievements',
-        icon: Trophy,
-    },
-    {
-        id: 'favorites',
-        label: 'Favorites',
-        href: '/favorites',
-        icon: Heart,
     },
     {
         id: 'profile',

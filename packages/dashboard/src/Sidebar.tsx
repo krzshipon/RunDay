@@ -58,7 +58,7 @@ function SubNavigationItem({ item, pathname, onNavigate, theme }: NavigationItem
                             : 'bg-slate-400'
                         }`} />
 
-                    <item.icon className="mr-4 h-3.5 w-3.5 opacity-80" />
+                    <item.icon className="mr-3 h-3.5 w-3.5 opacity-80" />
                     <span className="flex-1 text-xs font-medium">{item.label}</span>
                     {item.badge && (
                         <span className="ml-2 px-1.5 py-0.5 text-xs bg-[#FF9F1C]/80 text-white rounded-full shadow-sm text-[10px]">

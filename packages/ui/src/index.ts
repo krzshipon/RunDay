@@ -15,6 +15,9 @@ export type { CardProps } from './components/Card'
 export { Input } from './components/Input'
 export type { InputProps } from './components/Input'
 
+export { Label } from './components/Label'
+export type { LabelProps } from './components/Label'
+
 export { Badge, getStatusBadgeVariant } from './components/Badge'
 export type { BadgeProps } from './components/Badge'
 

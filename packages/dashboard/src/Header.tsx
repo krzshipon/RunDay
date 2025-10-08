@@ -43,7 +43,7 @@ export function Header({
                         </div>
                     </div>
 
-                    <div className="flex items-center space-x-4 mr-6">
+                    <div className="flex items-center space-x-3 mr-6">
                         <div className="hidden md:flex flex-col items-end">
                             <span className={`text-sm ${secondaryTextClass}`}>
                                 Welcome, {user.name || user.email.split('@')[0]}
@@ -55,18 +55,37 @@ export function Header({
                             )}
                         </div>
 
-                        {user.avatar ? (
-                            <img
-                                src={user.avatar}
-                                alt={user.name || user.email}
-                                className="w-8 h-8 rounded-full ring-2 ring-[#FF9F1C] ring-opacity-50"
-                            />
-                        ) : (
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${isDark ? 'bg-slate-600 text-white' : 'bg-[#EDF2F4] text-[#2B2D42]'
-                                }`}>
-                                {(user.name || user.email).charAt(0).toUpperCase()}
-                            </div>
-                        )}
+                        {/* Clickable Profile Avatar */}
+                        <button
+                            onClick={() => {
+                                if (typeof window !== 'undefined') {
+                                    // Navigate to profile for both user and admin roles
+                                    if (user.role === 'user' || user.role === 'admin') {
+                                        window.location.href = '/profile';
+                                    }
+                                }
+                            }}
+                            className={`focus:outline-none focus:ring-2 focus:ring-[#FF9F1C] focus:ring-opacity-50 rounded-full transition-all duration-200 ${(user.role === 'user' || user.role === 'admin') ? 'hover:scale-110 cursor-pointer' : 'cursor-default'
+                                }`}
+                            disabled={!(user.role === 'user' || user.role === 'admin')}
+                            title={(user.role === 'user' || user.role === 'admin') ? 'Go to Profile' : undefined}
+                        >
+                            {user.avatar ? (
+                                <img
+                                    src={user.avatar}
+                                    alt={user.name || user.email}
+                                    className="w-8 h-8 rounded-full ring-2 ring-[#FF9F1C] ring-opacity-50"
+                                />
+                            ) : (
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${isDark ? 'bg-slate-600 text-white hover:bg-slate-500' : 'bg-[#EDF2F4] text-[#2B2D42] hover:bg-slate-200'
+                                    }`}>
+                                    {(user.name || user.email).charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                        </button>
+
+                        {/* Add some spacing before logout button */}
+                        <div className="w-2"></div>
 
                         <Button
                             variant="secondary"
@@ -78,7 +97,7 @@ export function Header({
                                 }`}
                         >
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" />
                             </svg>
                             <span className="hidden sm:inline">Sign Out</span>
                         </Button>
