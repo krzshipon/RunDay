@@ -9,6 +9,9 @@ interface AnalyticsProviderProps {
 
 export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     useEffect(() => {
+        // Only run on client side
+        if (typeof window === 'undefined') return;
+
         // Initialize analytics for user app
         Analytics.initialize('user');
 

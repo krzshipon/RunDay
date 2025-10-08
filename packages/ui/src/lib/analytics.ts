@@ -8,10 +8,14 @@ export interface AnalyticsEvent {
 }
 
 export class Analytics {
-    private static isProduction = process.env.NODE_ENV === 'production';
+    private static isProduction = typeof window !== 'undefined' && process.env.NODE_ENV === 'production';
     private static appName: string;
+    private static isClient = typeof window !== 'undefined';
 
     static initialize(appName: 'user' | 'admin') {
+        // Only initialize on client side
+        if (!this.isClient) return;
+
         this.appName = appName;
         if (this.isProduction) {
             console.log(`🔍 Analytics initialized for ${appName} app`);
@@ -19,14 +23,17 @@ export class Analytics {
     }
 
     static track(event: string, properties?: Record<string, any>) {
+        // Only track on client side
+        if (!this.isClient) return;
+
         const analyticsEvent: AnalyticsEvent = {
             event,
             properties: {
                 ...properties,
                 app: this.appName,
                 timestamp: new Date().toISOString(),
-                url: typeof window !== 'undefined' ? window.location.href : 'server',
-                userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server'
+                url: window.location.href,
+                userAgent: window.navigator.userAgent
             },
             timestamp: new Date()
         };
@@ -43,6 +50,8 @@ export class Analytics {
     }
 
     private static storeEvent(event: AnalyticsEvent) {
+        if (!this.isClient) return;
+
         try {
             const events = this.getStoredEvents();
             events.push(event);
@@ -56,6 +65,8 @@ export class Analytics {
     }
 
     static getStoredEvents(): AnalyticsEvent[] {
+        if (!this.isClient) return [];
+
         try {
             const stored = localStorage.getItem('runday_analytics');
             return stored ? JSON.parse(stored) : [];
@@ -67,26 +78,32 @@ export class Analytics {
 
     // Common event tracking methods
     static trackPageView(page: string) {
+        if (!this.isClient) return;
         this.track('page_view', { page });
     }
 
     static trackUserAction(action: string, details?: Record<string, any>) {
+        if (!this.isClient) return;
         this.track('user_action', { action, ...details });
     }
 
     static trackError(error: string, details?: Record<string, any>) {
+        if (!this.isClient) return;
         this.track('error', { error, ...details });
     }
 
     static trackRegistration(eventId: string) {
+        if (!this.isClient) return;
         this.track('event_registration', { eventId });
     }
 
     static trackCertificateGeneration(eventId: string) {
+        if (!this.isClient) return;
         this.track('certificate_generated', { eventId });
     }
 
     static trackEventCreation(eventId: string) {
+        if (!this.isClient) return;
         this.track('event_created', { eventId });
     }
 }
