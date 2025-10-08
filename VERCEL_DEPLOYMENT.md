@@ -34,9 +34,9 @@ Node.js Version: 18.x
 - `NEXT_PUBLIC_ADMIN_URL`: https://run-day-admin.vercel.app  
 - `NEXT_PUBLIC_APP_URL`: (same as above for each app)
 
-### Live Applications:
-- **User App**: https://run-day-user.vercel.app
-- **Admin App**: https://run-day-admin.vercel.app
+## LIVE DEPLOYMENT URLS:
+✅ User App: https://run-day-user.vercel.app
+✅ Admin App: https://run-day-admin.vercel.app
 
 ## Auto-Deployment Features:
 ✅ Automatic deployments on main branch push

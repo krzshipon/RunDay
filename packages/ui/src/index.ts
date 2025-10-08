@@ -29,3 +29,5 @@ export { EventStatusToggle } from './components/EventStatusToggle'
 
 // Utilities
 export { cn, formatDate, formatTime, formatDateTime, getStatusColor } from './lib/utils'
+export { Analytics, trackError, trackPerformance } from './lib/analytics'
+export type { AnalyticsEvent } from './lib/analytics'
