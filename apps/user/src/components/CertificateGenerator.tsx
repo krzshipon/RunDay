@@ -57,7 +57,7 @@ export function CertificateGenerator({
     };
 
     const performanceLevel = getPerformanceLevel();
-    const eventDate = new Date(event.event_date);
+    const eventDate = new Date(event?.event_date || '');
 
     // Check for existing certificate
     useEffect(() => {

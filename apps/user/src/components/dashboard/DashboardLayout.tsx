@@ -23,8 +23,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         ...createUserDashboardConfig(
             {
                 id: user.id,
-                email: user.email,
-                name: user.user_metadata?.full_name || user.email,
+                email: user.email || '',
+                name: user.user_metadata?.full_name || user.email || 'User',
             },
             signOut
         ),

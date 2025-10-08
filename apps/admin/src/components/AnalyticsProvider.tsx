@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Analytics } from '@runday/ui';
 
 interface AnalyticsProviderProps {
     children: React.ReactNode;
@@ -12,37 +11,47 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
         // Only run on client side
         if (typeof window === 'undefined') return;
 
-        // Initialize analytics for admin app
-        Analytics.initialize('admin');
+        let cleanup: (() => void) | undefined;
 
-        // Track initial page view
-        Analytics.trackPageView(window.location.pathname);
+        // Dynamic import to ensure client-side only execution
+        import('@runday/ui').then(({ Analytics }) => {
+            // Initialize analytics for admin app
+            Analytics.initialize('admin');
 
-        // Track page changes
-        const originalPushState = history.pushState;
-        const originalReplaceState = history.replaceState;
-
-        const trackPageChange = () => {
+            // Track initial page view
             Analytics.trackPageView(window.location.pathname);
-        };
 
-        history.pushState = function (...args) {
-            originalPushState.apply(history, args);
-            setTimeout(trackPageChange, 0);
-        };
+            // Track page changes
+            const originalPushState = history.pushState;
+            const originalReplaceState = history.replaceState;
 
-        history.replaceState = function (...args) {
-            originalReplaceState.apply(history, args);
-            setTimeout(trackPageChange, 0);
-        };
+            const trackPageChange = () => {
+                Analytics.trackPageView(window.location.pathname);
+            };
 
-        window.addEventListener('popstate', trackPageChange);
+            history.pushState = function (...args) {
+                originalPushState.apply(history, args);
+                setTimeout(trackPageChange, 0);
+            };
 
-        // Cleanup
+            history.replaceState = function (...args) {
+                originalReplaceState.apply(history, args);
+                setTimeout(trackPageChange, 0);
+            };
+
+            window.addEventListener('popstate', trackPageChange);
+
+            // Setup cleanup
+            cleanup = () => {
+                history.pushState = originalPushState;
+                history.replaceState = originalReplaceState;
+                window.removeEventListener('popstate', trackPageChange);
+            };
+        });
+
+        // Return cleanup function
         return () => {
-            history.pushState = originalPushState;
-            history.replaceState = originalReplaceState;
-            window.removeEventListener('popstate', trackPageChange);
+            if (cleanup) cleanup();
         };
     }, []);
 

@@ -1,5 +1,4 @@
 // Basic Analytics and Monitoring Utilities
-'use client';
 
 export interface AnalyticsEvent {
     event: string;
@@ -8,18 +7,25 @@ export interface AnalyticsEvent {
 }
 
 export class Analytics {
-    private static isProduction = typeof window !== 'undefined' && process.env.NODE_ENV === 'production';
     private static appName: string;
-    private static isClient = typeof window !== 'undefined';
+
+    private static get isClient() {
+        return typeof window !== 'undefined';
+    }
+
+    private static get isProduction() {
+        return this.isClient && process.env.NODE_ENV === 'production';
+    }
 
     static initialize(appName: 'user' | 'admin') {
         // Only initialize on client side
-        if (!this.isClient) return;
+        if (!this.isClient) {
+            console.log('Analytics.initialize called on server side, skipping');
+            return;
+        }
 
         this.appName = appName;
-        if (this.isProduction) {
-            console.log(`🔍 Analytics initialized for ${appName} app`);
-        }
+        console.log(`🔍 Analytics initialized for ${appName} app`);
     }
 
     static track(event: string, properties?: Record<string, any>) {
