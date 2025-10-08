@@ -15,6 +15,7 @@ export type { CardProps } from './components/Card'
 export { Input } from './components/Input'
 export type { InputProps } from './components/Input'
 
+// Form components - ensure Label is properly exported
 export { Label } from './components/Label'
 export type { LabelProps } from './components/Label'
 

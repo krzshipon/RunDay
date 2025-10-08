@@ -1,7 +1,7 @@
 {
-    "buildCommand": "cd ../.. && npm install && npm run build --workspace=apps/admin",
+    "buildCommand": "cd ../.. && npm install --force && npm run build --workspace=apps/admin",
     "devCommand": "cd ../.. && npm run dev --workspace=apps/admin",
-    "installCommand": "cd ../.. && npm install",
+    "installCommand": "cd ../.. && npm install --force",
     "outputDirectory": ".next",
     "framework": "nextjs",
     "ignoreCommand": "git diff --quiet HEAD^ HEAD ./"
